@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SDLWrapper">
+      <UniqueIdentifier>{592f8494-aa2b-4bee-84f4-fd06fc7be4a4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SDLWrapper.h">
+      <Filter>SDLWrapper</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
