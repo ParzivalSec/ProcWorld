@@ -1,18 +1,15 @@
 #include <iostream>
-#include "SDLWrapper.h"
-
+#include "Application.h"
 
 int main(int argc, char** argv) {
-	
-	SDL_Init(SDL_INIT_VIDEO);
 
-	sdl2::window_ptr_t window = sdl2::make_window("ProcWorld",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
-		1280, 720, SDL_WINDOW_OPENGL);
+	Application proceduralWorlds("ProcWorld by Lukas Vogl", 1280, 720);
 
-	SDL_Delay(3000);
-
-	SDL_Quit();
+	if (!proceduralWorlds.HasErrors()) {
+		proceduralWorlds.Run();
+	} else {
+		std::cout << "ERROR : Application could not be intiialized!" << std::endl;
+	}
 	
 	return 0;
 }

@@ -88,11 +88,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,13 +104,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\lib\x64;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-d.lib;freetype27d.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;SOIL.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;assimp-d.lib;freetype27d.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,13 +122,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -138,22 +142,37 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\include;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\lib\x64;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp.lib;freetype27.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\glew\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\sdl2\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\freetype\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\assimp\lib;D:\MGS\Sem_2\ShaderProgramming\ProcWorld\Dependencies\soil;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;SOIL.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;assimp.lib;freetype27.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OpenGLRenderer.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="FileReader.h" />
+    <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="SDLWrapper.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

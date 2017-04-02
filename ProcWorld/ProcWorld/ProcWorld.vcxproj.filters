@@ -4,13 +4,82 @@
     <Filter Include="SDLWrapper">
       <UniqueIdentifier>{592f8494-aa2b-4bee-84f4-fd06fc7be4a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{6a25fe6b-5bf0-4657-9b91-ece7d62b7287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Clock">
+      <UniqueIdentifier>{b4193edc-d4d3-4499-ba5d-c8fb40baf9c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{adfd1f82-f0b1-4719-8cd9-57e1e21359a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{dbf5d9e3-5ec8-4c41-a0d4-bfd910484608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{b919a518-19cd-4151-86aa-30d44b7622e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{e18f8df2-1a2a-4869-b835-54148610f63a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Camera">
+      <UniqueIdentifier>{d25b5a55-b074-4300-9c1c-462bd700a91e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Renderer">
+      <UniqueIdentifier>{8370b94b-9e9c-4e01-83f9-4511df9aee50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Application.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Clock</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="FileReader.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Graphics\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDLWrapper.h">
       <Filter>SDLWrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Clock</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="FileReader.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Graphics\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
