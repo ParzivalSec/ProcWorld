@@ -28,6 +28,15 @@
     <Filter Include="Graphics\Renderer">
       <UniqueIdentifier>{8370b94b-9e9c-4e01-83f9-4511df9aee50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\RenderPasses">
+      <UniqueIdentifier>{0eb68f83-8db6-44ce-892e-7e30f45eea9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Textures">
+      <UniqueIdentifier>{53c3be46-6cae-48df-b076-33094db37326}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LUTs">
+      <UniqueIdentifier>{a1296784-a2a6-4103-9aa3-e007147f6e73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -51,6 +60,15 @@
     </ClCompile>
     <ClCompile Include="OpenGLRenderer.cpp">
       <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="DensityPass.cpp">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture3D.cpp">
+      <Filter>Graphics\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryPass.cpp">
+      <Filter>Graphics\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +98,18 @@
     </ClInclude>
     <ClInclude Include="OpenGLRenderer.h">
       <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="DensityPass.h">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture3D.h">
+      <Filter>Graphics\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryPass.h">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="mc_cases_lut.h">
+      <Filter>LUTs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

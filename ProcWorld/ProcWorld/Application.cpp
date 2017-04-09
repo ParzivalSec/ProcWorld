@@ -6,6 +6,8 @@
 #include "AssetManager.h"
 #include "OpenGLRenderer.h"
 #include "Camera.h"
+#include "DensityPass.h"
+#include "GeometryPass.h"
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -49,6 +51,21 @@ void Application::Run() {
 	prg.AddShaders(GL_VERTEX_SHADER, "Color.vert", GL_FRAGMENT_SHADER, "Color.frag");
 	prg.Link();
 
+	ShaderProgram& density = assMng.AddShaderSet("Density");
+	density.AddShaders(GL_VERTEX_SHADER, "build_density_tex.vert",
+		GL_GEOMETRY_SHADER, "build_density_tex.geom",
+		GL_FRAGMENT_SHADER, "build_density_tex.frag");
+
+	density.Link();
+
+	// INFO: setup 3DTetxure to render the density values to
+	DensityPass densityPass(96, 96, 256);
+	densityPass.CreateDensityTexture();
+	densityPass.FillDensityTexture(density);
+	
+	GeometryPass geometryPass;
+	geometryPass.SetupResources(assMng);
+
 	duration<float> average_deltaTime;
 	int fpsCounter = 0;
 	while (running) {
@@ -56,12 +73,56 @@ void Application::Run() {
 		duration<float> dt = currentFrame - lastFrame;
 		
 		SDL_Event event;
+		float deltaX = 0.0f;
+		float deltaY = 0.0f;
 
 		// Input Section
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT:
 					status = 1;
+					break;
+
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE) {
+						status = 1;
+						break;
+					}
+
+					if (event.key.keysym.sym == SDLK_w) {
+						cam.ActivateKey(MOVEMENT_DIRECTION::FORWARD);
+					} 
+					else if (event.key.keysym.sym == SDLK_s) {
+						cam.ActivateKey(MOVEMENT_DIRECTION::BACKWARD);
+					}
+					else if (event.key.keysym.sym == SDLK_d) {
+						cam.ActivateKey(MOVEMENT_DIRECTION::RIGHT);
+					}
+					else if (event.key.keysym.sym == SDLK_a) {
+						cam.ActivateKey(MOVEMENT_DIRECTION::LEFT);
+					}
+					break;
+
+				case SDL_KEYUP:
+					if (event.key.keysym.sym == SDLK_w) {
+						cam.DeactivateKey(MOVEMENT_DIRECTION::FORWARD);
+					}
+					else if (event.key.keysym.sym == SDLK_s) {
+						cam.DeactivateKey(MOVEMENT_DIRECTION::BACKWARD);
+					}
+					else if (event.key.keysym.sym == SDLK_d) {
+						cam.DeactivateKey(MOVEMENT_DIRECTION::RIGHT);
+					}
+					else if (event.key.keysym.sym == SDLK_a) {
+						cam.DeactivateKey(MOVEMENT_DIRECTION::LEFT);
+					}
+					break;
+
+				case SDL_MOUSEMOTION:
+					deltaX += static_cast<float>(event.motion.x - 600);
+					deltaY += static_cast<float>(event.motion.y - 400);
+					cam.ProcessMotion(deltaX * dt.count(), deltaY * dt.count());
+					SDL_WarpMouseInWindow(m_applicationWindow.get(), 600, 400);
 					break;
 
 				default:
@@ -71,7 +132,7 @@ void Application::Run() {
 		
 		// Check if assets have to be reloaded
 		assMng.ReloadData();
-
+		cam.ProcessMovement(dt.count());
 		// Update & render section
 		Update(dt.count());
 	
@@ -100,7 +161,8 @@ void Application::Run() {
 			OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::mat4(1.0f));
 
 			OpenGLRenderer::BindVertexArray(VAO);
-				OpenGLRenderer::Draw(GL_TRIANGLES, 0, 3);
+				// OpenGLRenderer::Draw(GL_TRIANGLES, 0, 3);
+				glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 10);
 			OpenGLRenderer::UnbindVertexArray();
 
 			glDrawBuffer(GL_BACK);

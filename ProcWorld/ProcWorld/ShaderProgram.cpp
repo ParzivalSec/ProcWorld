@@ -63,7 +63,6 @@ Shader ShaderProgram::CompileShader(GLenum type, std::string fileName) {
 	result.fileName = fileName;
 	result.type = type;
 
-	// TODO: Load shader sourc
 	FileReader fileReader;
 	fs::path shaderFile = (fs::current_path() += SHADER_DIR) /= fileName;
 	std::cout << "Compiling : " << shaderFile << std::endl;

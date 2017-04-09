@@ -157,21 +157,28 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DensityPass.cpp" />
     <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="GeometryPass.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DensityPass.h" />
     <ClInclude Include="FileReader.h" />
+    <ClInclude Include="GeometryPass.h" />
+    <ClInclude Include="mc_cases_lut.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="SDLWrapper.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Texture3D.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
