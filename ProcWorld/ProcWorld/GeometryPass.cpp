@@ -4,108 +4,166 @@
 
 #include "AssetManager.h"
 #include "mc_cases_lut.h"
+#include "OpenGLRenderer.h"
+#include <iostream>
 
 // TODO: Get rid of magic numbers and make them settable (but is okey for first assignment)
 void GeometryPass::SetupResources(AssetManager& assetManager) 
 {
-	glGenVertexArrays(1, &m_fakePointsVAO);
-	glBindVertexArray(m_fakePointsVAO);
+	GenerateFakePointsBuffer();
+	GenerateSliceBuffers();
 
-	// Create the buffer with the fake vertex uv data
-	{
-		glGenBuffers(1, &m_fakePointsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_fakePointsVBO);
+	SetupMarchinCubeShader(assetManager);
 
-		float u = 0.0f, v = 0.0f;
-		float step = 1.0f / 96.0f;
-		for (size_t i = 0; i < 18432; i += 2)
-		{
-			m_fakePointsUVs[i] = u;
-			m_fakePointsUVs[i + 1] = v;
+	// TODO: Add LUT uniforms for GS
+	GenerateLUTBuffers();
 
-			u += step;
-
-			if (i % 95 == 0 && i > 0.0f)
-			{
-				v += step;
-				u = 0.0f;
-			}
-		}
-
-		glBufferData(GL_ARRAY_BUFFER, 18432 * sizeof(float), m_fakePointsUVs, GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-	}
-	
-	// Create the 16 buffers for the slices
-	{
-		glGenBuffers(16, m_sliceTBOs);
-
-		// Resize the transform feedback buffers to hold the vertex datat to generate
-		for (size_t i = 0; i < 16; ++i)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, m_sliceTBOs[i]);
-			// TODO: Determine how much data I really need to size the VBOs (definitely not 43700)
-			glBufferData(GL_ARRAY_BUFFER, 43700 * 3, nullptr, GL_STATIC_READ);
-		}
-	}
-	
-	// Create and link the special shader program with transform feedback support
-	{
-		ShaderProgram& m_cubes_prg = assetManager.AddShaderSet("Marching_Cubes");
-		m_cubes_prg.AddShaders(GL_VERTEX_SHADER, "build_geometry.vert", GL_GEOMETRY_SHADER, "build_geometry.geom");
-
-		// TRANSFORM FEEDBACK settings
-		const GLchar* feedbackVaryings[] = { "position" };
-		glTransformFeedbackVaryings(m_shaderProgram, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
-
-		m_cubes_prg.Link();
-
-		m_shaderProgram = m_cubes_prg.m_id;
-	}
-
-	// Create the lut uniform buffer objects
-	{
-		glGenBuffers(1, &m_cubeToPolyUBO);
-		// Allocate storage for the UBO
-		glBindBuffer(GL_UNIFORM_BUFFER, m_cubeToPolyUBO);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(uint32_t) * 256, lut::case_to_poly, GL_DYNAMIC_DRAW);
-
-		glGenBuffers(1, &m_triangleUBO);
-		// Allocate storage for the UBO
-		glBindBuffer(GL_UNIFORM_BUFFER, m_triangleUBO);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(int32_t) * 5120, lut::case_to_tri, GL_DYNAMIC_DRAW);
-	}
-
-	// Create buffer for world space Y data
-	{
-		glGenBuffers(1, &m_wsYposition);
-		glBindBuffer(GL_UNIFORM_BUFFER, m_wsYposition);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(float) * 256, nullptr, GL_STATIC_DRAW);
-	}
+	GenerateYPosBuffer();
 }
 
-void GeometryPass::GenerateGeometry(void) 
+void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 {
-	glUseProgram(m_shaderProgram);
+	glEnable(GL_RASTERIZER_DISCARD);
+	GLint density_vol_loc = glGetUniformLocation(m_shaderProgram, "density_texture");
 
+	OpenGLRenderer::UseShader(m_shaderProgram);
+
+	glUniform1i(density_vol_loc, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_3D, densityPass.m_densityTexture.textureID);
+
+	uint32_t lut_poly_index = glGetUniformBlockIndex(m_shaderProgram, "lut_poly");
+	uint32_t lut_tri_index = glGetUniformBlockIndex(m_shaderProgram, "lut_tri");
+	uint32_t y_pos = glGetUniformBlockIndex(m_shaderProgram, "yPos");
+	uint32_t y_pos_above = glGetUniformBlockIndex(m_shaderProgram, "yPosAbove");
+
+	glUniformBlockBinding(m_shaderProgram, lut_poly_index, 0);
+	glUniformBlockBinding(m_shaderProgram, lut_tri_index, 1);
+	glUniformBlockBinding(m_shaderProgram, y_pos, 2);
+	glUniformBlockBinding(m_shaderProgram, y_pos_above, 3);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_cubeToPolyUBO);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_triangleUBO);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_wsYposition);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_wsYpositionAbove);
+
+	float yStep = (2.0f * (256.0f / 96.0f)) / 256.0f;
 	for (size_t i = 0; i < 16; ++i) 
 	{
 		for (size_t y = 0; y < 16; ++y) 
 		{
-			m_wsYPositionData[y] = (y * 10) + (i * 160);
+			m_wsYPositionData[y] = (i * 16 * yStep) + (y * yStep);
+			m_wsYPositionAboveData[y] = (i * 16 * yStep) + ((y + 1) * yStep);
 		}
 
-		// Set uniforms for shader draw
+		glBindBuffer(GL_UNIFORM_BUFFER, m_wsYposition);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, 256 * sizeof(float), &m_wsYPositionData);
 
-			
-		glEnable(GL_RASTERIZER_DISCARD);
+		glBindBuffer(GL_UNIFORM_BUFFER, m_wsYpositionAbove);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, 256 * sizeof(float), &m_wsYPositionAboveData);
+
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_sliceTBOs[i]);
-		
-		glBeginTransformFeedback(GL_TRIANGLES);
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 18432, 16);
-		glEndTransformFeedback();
-		glFlush();
+
+		OpenGLRenderer::BindVertexArray(m_fakePointsVAO);
+			// Begin: Transform Feedback
+			glBeginTransformFeedback(GL_TRIANGLES);
+				glDrawArraysInstanced(GL_POINTS, 0, 9025, 16);
+			// End: Tranform Feedback
+			glEndTransformFeedback();
+		OpenGLRenderer::UnbindVertexArray();
 	}
+	glFlush();
+
+	glDisable(GL_RASTERIZER_DISCARD);
+}
+
+void GeometryPass::GenerateFakePointsBuffer(void) 
+{
+	float u = 0.0f, v = 0.0f;
+	float step = 2.0f / 95.0f;
+	for (size_t i = 0; i < 18050; i += 2)
+	{
+		m_fakePointsUVs[i] = u;
+		m_fakePointsUVs[i + 1] = v;
+
+		u += step;
+
+		if (i % 188 == 0 && i > 0.0f)
+		{
+			v += step;
+			u = 0.0f;
+		}
+	}
+
+	glGenVertexArrays(1, &m_fakePointsVAO);
+	glGenBuffers(1, &m_fakePointsVBO);
+
+	glBindVertexArray(m_fakePointsVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_fakePointsVBO);
+		glBufferData(GL_ARRAY_BUFFER, 18050 * sizeof(float), &m_fakePointsUVs, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+	glBindVertexArray(0);
+}
+
+void GeometryPass::GenerateSliceBuffers(void) 
+{
+	glGenBuffers(16, m_sliceTBOs);
+
+	// Resize the transform feedback buffers to hold the vertex datat to generate
+	for (size_t i = 0; i < 16; ++i)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_sliceTBOs[i]);
+		// TODO: Determine how much data I really need to size the VBOs (definitely not 43700)
+		glBufferData(GL_ARRAY_BUFFER, 43700 * 3 * sizeof(float), nullptr, GL_STATIC_READ);
+	}
+}
+
+void GeometryPass::GenerateLUTBuffers(void) 
+{
+	// NUM POLY LUT
+	glGenBuffers(1, &m_cubeToPolyUBO);
+	// Allocate storage for the UBO
+	glBindBuffer(GL_UNIFORM_BUFFER, m_cubeToPolyUBO);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(uint32_t) * 256, nullptr, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, m_cubeToPolyUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 256 * sizeof(uint32_t), &lut::case_to_poly);
+
+	// TRIANGLE LUT
+	glGenBuffers(1, &m_triangleUBO);
+	// Allocate storage for the UBO
+	glBindBuffer(GL_UNIFORM_BUFFER, m_triangleUBO);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(int32_t) * 5120, nullptr, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, m_triangleUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(int32_t) * 5120, &lut::case_to_tri);
+}
+
+void GeometryPass::SetupMarchinCubeShader(AssetManager& assetManager) 
+{
+	ShaderProgram& m_cubes_prg = assetManager.AddShaderSet("Marching_Cubes");
+	m_cubes_prg.AddShaders(GL_VERTEX_SHADER, "build_geometry.vert", GL_GEOMETRY_SHADER, "build_geometry.geom");
+
+	m_shaderProgram = m_cubes_prg.m_id;
+
+	const GLchar* feedbackVaryings[] = { "position" };
+	glTransformFeedbackVaryings(m_shaderProgram, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+
+	m_cubes_prg.Link();
+}
+
+void GeometryPass::GenerateYPosBuffer(void) 
+{
+	glGenBuffers(1, &m_wsYposition);
+	glBindBuffer(GL_UNIFORM_BUFFER, m_wsYposition);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(float) * 256, nullptr, GL_STATIC_DRAW); 
+
+	glGenBuffers(1, &m_wsYpositionAbove);
+	glBindBuffer(GL_UNIFORM_BUFFER, m_wsYpositionAbove);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(float) * 256, nullptr, GL_STATIC_DRAW);
 }

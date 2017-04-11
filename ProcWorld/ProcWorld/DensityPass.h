@@ -10,7 +10,6 @@ public:
 	void CreateDensityTexture(void);
 	void FillDensityTexture(const ShaderProgram& shader);
 
-private:
 	Texture3D m_densityTexture;
 	GLuint m_densityFBO;
 };

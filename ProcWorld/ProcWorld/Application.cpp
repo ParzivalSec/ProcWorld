@@ -129,20 +129,22 @@ void Application::Run() {
 					break;
 			}
 		}
+
+		geometryPass.GenerateGeometry(densityPass);
 		
 		// Check if assets have to be reloaded
 		assMng.ReloadData();
 		cam.ProcessMovement(dt.count());
 		// Update & render section
 		Update(dt.count());
-	
+
 		OpenGLRenderer::ViewPort(0, 0, m_windowWidth, m_windowHeight);
 		OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render
 		{
 			GLuint VBO, VAO;
-			GLfloat tri[9] = { 1.0f, 0.0f, -25.0f, 0.0f, 1.0f, -25.0f, -1.0f, 0.0f, -25.0f };
+			GLfloat tri[9] = { 96.0f, 0.0f, -25.0f, 0.0f, 256.0f, -25.0f, -96.0f, 0.0f, -25.0f };
 
 			OpenGLRenderer::CreateVertexArray(VAO);
 			OpenGLRenderer::CreateVertexBuffer(VBO);
@@ -165,7 +167,7 @@ void Application::Run() {
 				glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 10);
 			OpenGLRenderer::UnbindVertexArray();
 
-			glDrawBuffer(GL_BACK);
+			//glDrawBuffer(GL_BACK);
 		}
 
 		SDL_GL_SwapWindow(m_applicationWindow.get());

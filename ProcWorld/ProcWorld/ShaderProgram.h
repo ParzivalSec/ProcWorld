@@ -7,6 +7,8 @@ static const std::string SHADER_DIR = "/data/shader/";
 
 class ShaderProgram {
 public:
+	ShaderProgram() { m_id = glCreateProgram();  }
+
 	template <typename ...Shaders>
 	void AddShaders(GLenum type, std::string fileName, Shaders... shaders);
 	void AddShaders(GLenum type, std::string fileName);

@@ -8,7 +8,6 @@ void ShaderProgram::AddShaders(GLenum type, std::string fileName) {
 }
 
 void ShaderProgram::Link(void) {
-	m_id = glCreateProgram();
 
 	GLint isLinked = 0;
 	for (const Shader& shader : m_shaders) {
