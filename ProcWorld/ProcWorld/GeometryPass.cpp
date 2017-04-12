@@ -24,10 +24,10 @@ void GeometryPass::SetupResources(AssetManager& assetManager)
 void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 {
 	glEnable(GL_RASTERIZER_DISCARD);
-	GLint density_vol_loc = glGetUniformLocation(m_shaderProgram, "density_texture");
 
 	OpenGLRenderer::UseShader(m_shaderProgram);
 
+	GLint density_vol_loc = glGetUniformLocation(m_shaderProgram, "density_texture");
 	glUniform1i(density_vol_loc, 0);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -48,7 +48,7 @@ void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 2, m_wsYposition);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, m_wsYpositionAbove);
 
-	float yStep = (2.0f * (256.0f / 96.0f)) / 256.0f;
+	float yStep = (1.0f * (256.0f / 96.0f)) / 256.0f;
 	for (size_t i = 0; i < 16; ++i) 
 	{
 		for (size_t y = 0; y < 16; ++y) 
@@ -58,10 +58,11 @@ void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 		}
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_wsYposition);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, 256 * sizeof(float), &m_wsYPositionData);
+		glBufferData(GL_UNIFORM_BUFFER, 256 * sizeof(float), &m_wsYPositionData, GL_DYNAMIC_DRAW);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_wsYpositionAbove);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, 256 * sizeof(float), &m_wsYPositionAboveData);
+		//glBufferSubData(GL_UNIFORM_BUFFER, 0, 256 * sizeof(float), &m_wsYPositionAboveData);
+		glBufferData(GL_UNIFORM_BUFFER, 256 * sizeof(float), &m_wsYPositionAboveData, GL_DYNAMIC_DRAW);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_sliceTBOs[i]);
 
@@ -73,14 +74,14 @@ void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 			glEndTransformFeedback();
 		OpenGLRenderer::UnbindVertexArray();
 	}
-	glFlush();
 
+	glFlush();
 	glDisable(GL_RASTERIZER_DISCARD);
 }
 
 void GeometryPass::GenerateFakePointsBuffer(void) 
 {
-	float u = 0.0f, v = 0.0f;
+	float u = -1.0f, v = -1.0f;
 	float step = 2.0f / 95.0f;
 	for (size_t i = 0; i < 18050; i += 2)
 	{
@@ -92,7 +93,7 @@ void GeometryPass::GenerateFakePointsBuffer(void)
 		if (i % 188 == 0 && i > 0.0f)
 		{
 			v += step;
-			u = 0.0f;
+			u = -1.0f;
 		}
 	}
 
@@ -117,7 +118,7 @@ void GeometryPass::GenerateSliceBuffers(void)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_sliceTBOs[i]);
 		// TODO: Determine how much data I really need to size the VBOs (definitely not 43700)
-		glBufferData(GL_ARRAY_BUFFER, 43700 * 3 * sizeof(float), nullptr, GL_STATIC_READ);
+		glBufferData(GL_ARRAY_BUFFER, 288800 * 3 * sizeof(float), nullptr, GL_STATIC_READ);
 	}
 }
 
@@ -137,22 +138,22 @@ void GeometryPass::GenerateLUTBuffers(void)
 	glGenBuffers(1, &m_triangleUBO);
 	// Allocate storage for the UBO
 	glBindBuffer(GL_UNIFORM_BUFFER, m_triangleUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(int32_t) * 5120, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(int32_t) * 4096, nullptr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, m_triangleUBO);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(int32_t) * 5120, &lut::case_to_tri);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(int32_t) * 4096, &lut::case_to_tri);
 }
 
 void GeometryPass::SetupMarchinCubeShader(AssetManager& assetManager) 
 {
 	ShaderProgram& m_cubes_prg = assetManager.AddShaderSet("Marching_Cubes");
-	m_cubes_prg.AddShaders(GL_VERTEX_SHADER, "build_geometry.vert", GL_GEOMETRY_SHADER, "build_geometry.geom");
+	m_cubes_prg.AddShaders(GL_VERTEX_SHADER, "visualize_3d_tex.vert", GL_GEOMETRY_SHADER, "visualize_3d_tex.geom");
 
 	m_shaderProgram = m_cubes_prg.m_id;
 
-	const GLchar* feedbackVaryings[] = { "position" };
-	glTransformFeedbackVaryings(m_shaderProgram, 1, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+	const GLchar* feedbackVaryings[] = { "position", "color"};
+	glTransformFeedbackVaryings(m_shaderProgram, 2, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
 
 	m_cubes_prg.Link();
 }

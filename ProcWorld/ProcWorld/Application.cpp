@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "DensityPass.h"
 #include "GeometryPass.h"
+#include <gtc/matrix_transform.inl>
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -41,7 +42,7 @@ void Application::Run() {
 	clock.StartTimer();
 	duration<float> lastFrame(0), currentFrame(0);
 
-	OpenGLRenderer::ClearColor(0.1f, 0.8f, 0.8f, 1.0f);
+	OpenGLRenderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	Camera cam(glm::vec3(0, 0, 0), glm::vec3(0, 0, -50), glm::vec3(0, 1, 0), 
 		45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
@@ -65,6 +66,7 @@ void Application::Run() {
 	
 	GeometryPass geometryPass;
 	geometryPass.SetupResources(assMng);
+	geometryPass.GenerateGeometry(densityPass);
 
 	duration<float> average_deltaTime;
 	int fpsCounter = 0;
@@ -129,8 +131,6 @@ void Application::Run() {
 					break;
 			}
 		}
-
-		geometryPass.GenerateGeometry(densityPass);
 		
 		// Check if assets have to be reloaded
 		assMng.ReloadData();
@@ -143,29 +143,36 @@ void Application::Run() {
 
 		// Render
 		{
-			GLuint VBO, VAO;
-			GLfloat tri[9] = { 96.0f, 0.0f, -25.0f, 0.0f, 256.0f, -25.0f, -96.0f, 0.0f, -25.0f };
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			OpenGLRenderer::CreateVertexArray(VAO);
-			OpenGLRenderer::CreateVertexBuffer(VBO);
+			for (size_t i = 0; i < 16; ++i) {
+				GLuint VBO, VAO;
+				GLfloat tri[9] = { 96.0f, 0.0f, -25.0f, 0.0f, 256.0f, -25.0f, -96.0f, 0.0f, -25.0f };
 
-			OpenGLRenderer::BindVertexArray(VAO);
-				OpenGLRenderer::BindVertexBuffer(VBO);
-				OpenGLRenderer::LoadVertexBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), &tri, GL_STATIC_DRAW);
+				OpenGLRenderer::CreateVertexArray(VAO);
+				OpenGLRenderer::CreateVertexBuffer(VBO);
+
+				OpenGLRenderer::BindVertexArray(VAO);
+				OpenGLRenderer::BindVertexBuffer(geometryPass.m_sliceTBOs[i]);
+				//OpenGLRenderer::LoadVertexBufferData(GL_ARRAY_BUFFER, 43700 * 3 * sizeof(float), &geometryPass.m_sliceTBOs[0], GL_STATIC_DRAW);
 
 				OpenGLRenderer::EnableVertexAttribute(0);
-				OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-			OpenGLRenderer::UnbindVertexArray();
+				OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+				OpenGLRenderer::EnableVertexAttribute(1);
+				OpenGLRenderer::LinkVertexAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+				OpenGLRenderer::UnbindVertexArray();
 
-			OpenGLRenderer::UseShader(prg.m_id);
-			OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "view", cam.GetViewMat());
-			OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "projection", cam.GetProjectionMat());
-			OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::mat4(1.0f));
+				OpenGLRenderer::UseShader(prg.m_id);
+				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "view", cam.GetViewMat());
+				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "projection", cam.GetProjectionMat());
+				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(20.0f, 20.0f, 20.0f)));
 
-			OpenGLRenderer::BindVertexArray(VAO);
+				OpenGLRenderer::BindVertexArray(VAO);
 				// OpenGLRenderer::Draw(GL_TRIANGLES, 0, 3);
-				glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 10);
-			OpenGLRenderer::UnbindVertexArray();
+				glDrawArraysInstanced(GL_TRIANGLES, 0, 144400, 1);
+				OpenGLRenderer::UnbindVertexArray();
+			}
+			
 
 			//glDrawBuffer(GL_BACK);
 		}

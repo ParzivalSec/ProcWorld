@@ -1,4 +1,5 @@
 #version 410 core
+#pragma optimize (off)
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 15) out;
@@ -20,16 +21,21 @@ layout(shared) uniform lut_tri {
 	// uint mc_case;
 // } vertex_data[];
 
-in vec2 pos[];
-out vec4 position;
+in DebugData
+{
+	vec3 textureCoords;
+} debug[];
+
+in vec3 pos[];
+out vec3 position;
 
 void main()
 {
-	position = vec4(pos[0], case_to_poly[0], case_to_triangles[0]);
+	position = vec3(-2, debug[0].textureCoords.x, -2);
 	EmitVertex();
-	position = vec4(pos[0], 1, 1);
+	position = vec3(-3, pos[0].y, -3);
 	EmitVertex();
-	position = vec4(pos[0], 1, 1);
+	position = vec3(-4, pos[0].z, -4);
 	EmitVertex();
 	EndPrimitive();
 }

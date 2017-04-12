@@ -19,6 +19,7 @@ private:
 
 	void GenerateYPosBuffer(void);
 
+public:
 	uint32_t m_shaderProgram;
 	// Fake points data
 	GLuint m_fakePointsVAO;	
