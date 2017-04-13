@@ -17,7 +17,7 @@ void main()
 
 	// From CASCADES demo shader extracted 
 	// texture v coordinate is interpreted as z-coordinate in the 3D texture slice
-	vertex_data.tex_coords = vec4(uv.x * 2 -1,  gl_InstanceID * 10, uv.y * 2 - 1, 1.0f);
+	vertex_data.tex_coords = vec4(uv.x,  gl_InstanceID, uv.y, 1.0f);
 	vertex_data.position = projCoords;
 	vertex_data.instance_id = instance;
 }

@@ -53,8 +53,10 @@ void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 	{
 		for (size_t y = 0; y < 16; ++y) 
 		{
-			m_wsYPositionData[y] = (i * 16 * yStep) + (y * yStep);
-			m_wsYPositionAboveData[y] = (i * 16 * yStep) + ((y + 1) * yStep);
+			// TODO: Fix this strange thing with the Y-Values
+			// m_wsYPositionData[y] = (i * 16 * yStep) + (y * yStep);
+			m_wsYPositionData[y] = (i * 16 * (1.0f / 256.0f)) + y * (1.0f / 256.0f);
+			// m_wsYPositionAboveData[y] = (i * 16 * yStep) + ((y + 1) * yStep);
 		}
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_wsYposition);
@@ -68,11 +70,15 @@ void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 
 		OpenGLRenderer::BindVertexArray(m_fakePointsVAO);
 			// Begin: Transform Feedback
+			glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, m_query);
 			glBeginTransformFeedback(GL_TRIANGLES);
 				glDrawArraysInstanced(GL_POINTS, 0, 9025, 16);
 			// End: Tranform Feedback
 			glEndTransformFeedback();
+			glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
 		OpenGLRenderer::UnbindVertexArray();
+		glGetQueryObjectuiv(m_query, GL_QUERY_RESULT, &m_vericesPerSlice[i]);
+		printf("Primites genereated: %d \n", m_vericesPerSlice[i]);
 	}
 
 	glFlush();
@@ -111,6 +117,7 @@ void GeometryPass::GenerateFakePointsBuffer(void)
 
 void GeometryPass::GenerateSliceBuffers(void) 
 {
+	glGenQueries(1, &m_query);
 	glGenBuffers(16, m_sliceTBOs);
 
 	// Resize the transform feedback buffers to hold the vertex datat to generate

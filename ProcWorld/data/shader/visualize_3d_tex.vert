@@ -21,13 +21,12 @@ layout (shared) uniform yPos {
 void main()
 {
 	int instance = gl_InstanceID;
-	
+	vec3 inv_voxelSize = vec3(1/95.0f, 1/256.0f, 1/95.0f);
+		
 	vec3 wsCoord;
 	wsCoord.xz = (uv.xy + 1.0f) / 2.0f;
 	// // TODO: Sample y position from uniform buffer
-	wsCoord.y  = y_pos_slice[instance] * 0.5f;
-	
-	vec3 inv_voxelSize = vec3(1/95.0f, 1/256.0f, 1/95.0f);
+	wsCoord.y  = y_pos_slice[instance]; // - (0.5f * inv_voxelSize.y); //* 0.5f;
 	
 	vec4 step = vec4(inv_voxelSize, 0.0f);
 	

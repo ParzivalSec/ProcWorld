@@ -55,13 +55,13 @@ void main()
 	for (uint i = 0; case_to_triangles[table_pos + i] != -1; i += 3)
 	{
 		position = vec3(vertexList[case_to_triangles[table_pos + i + 0]]).xzy;
-		color = vertex_data[0].color.xyz;
+		color = vec3(1.0f, 0.0f, 0.0f);
 		EmitVertex();
 		position = vec3(vertexList[case_to_triangles[table_pos + i + 1]]).xzy;
 		color = vec3(1.0f, 0.0f, 0.0f);
 		EmitVertex();
 		position = vec3(vertexList[case_to_triangles[table_pos + i + 2]]).xzy;
-		color = vec3(0.0f, 1.0f, 0.0f);
+		color = vec3(1.0f, 0.0f, 0.0f);
 		EmitVertex();
 		
 		EndPrimitive();

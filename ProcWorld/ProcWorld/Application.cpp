@@ -140,6 +140,8 @@ void Application::Run() {
 
 		OpenGLRenderer::ViewPort(0, 0, m_windowWidth, m_windowHeight);
 		OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
 
 		// Render
 		{
@@ -165,11 +167,11 @@ void Application::Run() {
 				OpenGLRenderer::UseShader(prg.m_id);
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "view", cam.GetViewMat());
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "projection", cam.GetProjectionMat());
-				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(20.0f, 20.0f, 20.0f)));
+				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f)));
 
 				OpenGLRenderer::BindVertexArray(VAO);
 				// OpenGLRenderer::Draw(GL_TRIANGLES, 0, 3);
-				glDrawArraysInstanced(GL_TRIANGLES, 0, 144400, 1);
+				glDrawArraysInstanced(GL_TRIANGLES, 0, geometryPass.m_vericesPerSlice[i] * 6, 1);
 				OpenGLRenderer::UnbindVertexArray();
 			}
 			

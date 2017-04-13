@@ -26,8 +26,11 @@ public:
 	GLuint m_fakePointsVBO;
 	// Slice geometry
 	uint32_t m_sliceTBOs[16];
+	uint32_t m_vericesPerSlice[16];
 	uint32_t m_wsYposition;
 	uint32_t m_wsYpositionAbove;
+	// Get query of drawn primitves
+	uint32_t m_query;
 	// lut buffers
 	uint32_t m_cubeToPolyUBO;
 	uint32_t m_triangleUBO;
