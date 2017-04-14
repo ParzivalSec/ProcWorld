@@ -14,12 +14,12 @@ void DensityPass::CreateDensityTexture(void)
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
 }
 
-void DensityPass::FillDensityTexture(const ShaderProgram& shader)
+void DensityPass::FillDensityTexture(const ShaderProgram& shader, uint32_t noise_texture)
 {
 	glGenFramebuffers(1, &m_densityFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_densityFBO);
@@ -84,6 +84,12 @@ void DensityPass::FillDensityTexture(const ShaderProgram& shader)
 	//OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT);
 		
 	OpenGLRenderer::UseShader(shader.m_id);
+
+	GLint perlin_noise_loc = glGetUniformLocation(shader.m_id, "perlin_noise");
+	glUniform1i(perlin_noise_loc, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_3D, noise_texture);
 
 	OpenGLRenderer::BindVertexArray(VAO);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 30, 256);

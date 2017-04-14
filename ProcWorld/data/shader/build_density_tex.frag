@@ -18,6 +18,8 @@ float rand(vec2 co){
     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
+uniform sampler3D perlin_noise;
+
 void main()
 {
 	float f = 0.0f;
@@ -28,9 +30,9 @@ void main()
 	
 	vec3 center = vec3(0.5f, data.instance_id, 0.75f);
 	
-	vec3 pillar1 = vec3(center.x + 0.1f * sin(center.y * 0.05f), center.y, center.z + 0.1f * cos(center.y * 0.05f));
-	vec3 pillar2 = vec3((center.x + 0.025f) + 0.15f * sin(center.y * -0.05f), center.y, (center.z + 0.025f) + 0.15f * cos(center.y * -0.05f));
-	vec3 pillar3 = vec3((center.x - 0.025f) + 0.20f * sin(center.y * -0.025f), center.y, (center.z - 0.025f) + 0.20f * cos(center.y * -0.025f));
+	vec3 pillar1 = vec3(center.x + 0.05f * sin(center.y * 0.05f), center.y, center.z + 0.05f * cos(center.y * 0.05f));
+	vec3 pillar2 = vec3((center.x + 0.025f) + 0.2f * sin(center.y * -0.05f), center.y, (center.z + 0.025f) + 0.2f * cos(center.y * -0.05f));
+	vec3 pillar3 = vec3((center.x - 0.025f) + 0.1f * sin(center.y * -0.025f), center.y, (center.z - 0.025f) + 0.15f * cos(center.y * -0.025f));
 	// vec3 pillar2 = vec3(0.35f + 0.02 * sin(center.y * 50.0f + M_PI * 0.66f), center.y, 0.35f + 0.02f * cos(center.y * 50.0f + M_PI * 0.66f));
 	// vec3 pillar3 = vec3(0.45f + 0.02 * sin(center.y * 50.0f + M_PI * 0.66f), center.y, 0.45f + 0.02f * cos(center.y * 50.0f + M_PI * 0.66f));
 	
@@ -48,5 +50,10 @@ void main()
 	f -= pow(length(data.tex_coords.xz), 2.0f);
 	
 	// f += rand(vec2(2, data.instance_id / 4));
+	
+	float x2 = x * texture(perlin_noise, vec3(x, z, y)).x;
+	float y2 = y * texture(perlin_noise, vec3(x, z, y)).x;
+	float z2 = z * texture(perlin_noise, vec3(x, z, y)).x;
+	//f += 4.0f * texture(perlin_noise, vec3(x, y, z)).x;
 	
 	color = vec4(f, 0, 0, 0);}

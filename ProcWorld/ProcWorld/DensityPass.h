@@ -8,7 +8,7 @@ public:
 	DensityPass(size_t width, size_t height, size_t depth);
 
 	void CreateDensityTexture(void);
-	void FillDensityTexture(const ShaderProgram& shader);
+	void FillDensityTexture(const ShaderProgram& shader, uint32_t noise_texture);
 
 	Texture3D m_densityTexture;
 	GLuint m_densityFBO;

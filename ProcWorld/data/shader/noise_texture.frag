@@ -133,7 +133,7 @@ float pattern2( in vec2 p, out vec2 q, out vec2 r , in float time)
 {
     float l = 2.3;
     float g = 0.4;
-    int oc = 10; 
+    int oc = 5; 
      
     q.x = fbm( p + vec2(time,time),oc,l,g);
     q.y = fbm( p + vec2(5.2*time,1.3*time) ,oc,l,g);

@@ -63,10 +63,12 @@ void Application::Run() {
 	// INFO: setup 3DTetxure to render the density values to
 	DensityPass densityPass(96, 96, 256);
 	densityPass.CreateDensityTexture();
-	densityPass.FillDensityTexture(density);
 
 	GPUNoise noise;
 	noise.GenerateNoiseTextures(32, assMng);
+	noise.GeneratePerlinNoise();
+
+	densityPass.FillDensityTexture(density, noise.m_noiseTextures[0]);
 	
 	GeometryPass geometryPass;
 	geometryPass.SetupResources(assMng);
@@ -135,8 +137,6 @@ void Application::Run() {
 					break;
 			}
 		}
-
-		noise.GeneratePerlinNoise();
 		
 		// Check if assets have to be reloaded
 		assMng.ReloadData();
