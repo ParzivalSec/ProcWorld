@@ -160,6 +160,7 @@
     <ClCompile Include="DensityPass.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="GeometryPass.cpp" />
+    <ClCompile Include="GPUNoise.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="DensityPass.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="GeometryPass.h" />
+    <ClInclude Include="GPUNoise.h" />
     <ClInclude Include="mc_cases_lut.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="SDLWrapper.h" />

@@ -9,6 +9,7 @@
 #include "DensityPass.h"
 #include "GeometryPass.h"
 #include <gtc/matrix_transform.inl>
+#include "GPUNoise.h"
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -63,6 +64,9 @@ void Application::Run() {
 	DensityPass densityPass(96, 96, 256);
 	densityPass.CreateDensityTexture();
 	densityPass.FillDensityTexture(density);
+
+	GPUNoise noise;
+	noise.GenerateNoiseTextures(32, assMng);
 	
 	GeometryPass geometryPass;
 	geometryPass.SetupResources(assMng);
@@ -131,6 +135,8 @@ void Application::Run() {
 					break;
 			}
 		}
+
+		noise.GeneratePerlinNoise();
 		
 		// Check if assets have to be reloaded
 		assMng.ReloadData();

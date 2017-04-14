@@ -70,6 +70,9 @@
     <ClCompile Include="GeometryPass.cpp">
       <Filter>Graphics\RenderPasses</Filter>
     </ClCompile>
+    <ClCompile Include="GPUNoise.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDLWrapper.h">
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="mc_cases_lut.h">
       <Filter>LUTs</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUNoise.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
