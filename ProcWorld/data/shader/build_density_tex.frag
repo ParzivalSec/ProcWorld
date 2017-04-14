@@ -39,7 +39,7 @@ void main()
 	f += 1.0f / (length(data.tex_coords.xz - pillar2.xz) * 7.0f) - 1.0f;
 	f += 1.0f / (length(data.tex_coords.xz - pillar3.xz) * 7.0f) - 1.0f;
 	
-	// f += cos(data.tex_coords.y * 50.0f);
+	f += cos(data.tex_coords.y / 4.0f);
 	
 	// Negative pillar
 	f -= 1.0f / (length(data.tex_coords.xz - center.xz) * 5.0f) - 1.0f;
@@ -47,6 +47,6 @@ void main()
 	// Negative space at the boundaries of the texture 
 	f -= pow(length(data.tex_coords.xz), 2.0f);
 	
-	f += rand(vec2(2, data.instance_id));
+	// f += rand(vec2(2, data.instance_id / 4));
 	
 	color = vec4(f, 0, 0, 0);}
