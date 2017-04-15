@@ -8,7 +8,6 @@ void ShaderProgram::AddShaders(GLenum type, std::string fileName) {
 }
 
 void ShaderProgram::Link(void) {
-
 	GLint isLinked = 0;
 	for (const Shader& shader : m_shaders) {
 		glAttachShader(m_id, shader.id);
@@ -41,10 +40,13 @@ void ShaderProgram::Link(void) {
 }
 
 void ShaderProgram::Reload(void) {
-	glDeleteProgram(m_id);
+	// glDeleteProgram(m_id);
 	std::cout << "Reload triggered" << std::endl;
 
 	for (size_t i = 0; i < m_shaders.size(); ++i) {
+		glDetachShader(m_id, m_shaders[i].id); // gl_program is a GLuint for the shader program
+		glDeleteShader(m_shaders[i].id);
+
 		Shader new_shader = CompileShader(m_shaders[i].type, m_shaders[i].fileName);
 		m_shaders[i].isDirty = false;
 		if (new_shader.id > 0) {
