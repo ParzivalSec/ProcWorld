@@ -6,6 +6,7 @@ out VertexData
 {
 	vec4 position;
 	vec4 color;
+	vec3 normal;
 	int mc_case;
 	vec4 field0123;
 	vec4 field4567;
@@ -17,6 +18,17 @@ uniform sampler3D density_texture;
 layout (shared) uniform yPos {
 	float y_pos_slice[256];
 };
+
+vec3 calculateNormal(vec3 uvw, sampler3D tex, vec4 step_s)
+{
+	vec3 gradient = vec3(
+		texture(tex, uvw + step_s.xww).x - texture(tex, uvw - step_s.xww).x,
+		texture(tex, uvw + step_s.wwy).x - texture(tex, uvw - step_s.wwy).x,
+		texture(tex, uvw + step_s.wzw).x - texture(tex, uvw - step_s.wzw).x
+	);
+	
+	return normalize(-gradient);
+}
 
 void main()
 {
@@ -76,4 +88,5 @@ void main()
 	vertex_data.mc_case = cube_case;
 	vertex_data.field0123 = field0123;
 	vertex_data.field4567 = field4567;
+	vertex_data.normal = calculateNormal(wsCoord.xzy, density_texture, step);
 }

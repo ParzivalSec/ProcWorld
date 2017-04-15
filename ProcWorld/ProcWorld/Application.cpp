@@ -151,38 +151,20 @@ void Application::Run() {
 
 		// Render
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			for (size_t i = 0; i < 16; ++i) {
-				GLuint VBO, VAO;
-				GLfloat tri[9] = { 96.0f, 0.0f, -25.0f, 0.0f, 256.0f, -25.0f, -96.0f, 0.0f, -25.0f };
-
-				OpenGLRenderer::CreateVertexArray(VAO);
-				OpenGLRenderer::CreateVertexBuffer(VBO);
-
-				OpenGLRenderer::BindVertexArray(VAO);
-				OpenGLRenderer::BindVertexBuffer(geometryPass.m_sliceTBOs[i]);
-				//OpenGLRenderer::LoadVertexBufferData(GL_ARRAY_BUFFER, 43700 * 3 * sizeof(float), &geometryPass.m_sliceTBOs[0], GL_STATIC_DRAW);
-
-				OpenGLRenderer::EnableVertexAttribute(0);
-				OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
-				OpenGLRenderer::EnableVertexAttribute(1);
-				OpenGLRenderer::LinkVertexAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-				OpenGLRenderer::UnbindVertexArray();
 
 				OpenGLRenderer::UseShader(prg.m_id);
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "view", cam.GetViewMat());
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "projection", cam.GetProjectionMat());
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f)));
 
-				OpenGLRenderer::BindVertexArray(VAO);
+				OpenGLRenderer::BindVertexArray(geometryPass.m_sliceVAOs[i]);
 				// OpenGLRenderer::Draw(GL_TRIANGLES, 0, 3);
 				glDrawArraysInstanced(GL_TRIANGLES, 0, geometryPass.m_vericesPerSlice[i] * 6, 1);
 				OpenGLRenderer::UnbindVertexArray();
 			}
-			
-
-			//glDrawBuffer(GL_BACK);
 		}
 
 		SDL_GL_SwapWindow(m_applicationWindow.get());

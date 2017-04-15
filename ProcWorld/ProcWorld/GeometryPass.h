@@ -27,6 +27,8 @@ public:
 	// Slice geometry
 	uint32_t m_sliceTBOs[16];
 	uint32_t m_vericesPerSlice[16];
+	uint32_t m_sliceVAOs[16];
+	// Y Pos
 	uint32_t m_wsYposition;
 	uint32_t m_wsYpositionAbove;
 	// Get query of drawn primitves

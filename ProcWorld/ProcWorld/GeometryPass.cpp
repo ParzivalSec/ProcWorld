@@ -119,6 +119,7 @@ void GeometryPass::GenerateSliceBuffers(void)
 {
 	glGenQueries(1, &m_query);
 	glGenBuffers(16, m_sliceTBOs);
+	glGenVertexArrays(16, m_sliceVAOs);
 
 	// Resize the transform feedback buffers to hold the vertex datat to generate
 	for (size_t i = 0; i < 16; ++i)
@@ -126,6 +127,15 @@ void GeometryPass::GenerateSliceBuffers(void)
 		glBindBuffer(GL_ARRAY_BUFFER, m_sliceTBOs[i]);
 		// TODO: Determine how much data I really need to size the VBOs (definitely not 43700)
 		glBufferData(GL_ARRAY_BUFFER, 288800 * 3 * sizeof(float), nullptr, GL_STATIC_READ);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		OpenGLRenderer::BindVertexArray(m_sliceVAOs[i]);
+			OpenGLRenderer::BindVertexBuffer(m_sliceTBOs[i]);
+			OpenGLRenderer::EnableVertexAttribute(0);
+			OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+			OpenGLRenderer::EnableVertexAttribute(1);
+			OpenGLRenderer::LinkVertexAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+		OpenGLRenderer::UnbindVertexArray();
 	}
 }
 
