@@ -74,6 +74,7 @@ void Application::Run() {
 	geometryPass.SetupResources(assMng);
 	geometryPass.GenerateGeometry(densityPass);
 
+	bool draw_wireframe = false;
 	duration<float> average_deltaTime;
 	int fpsCounter = 0;
 	while (running) {
@@ -124,6 +125,9 @@ void Application::Run() {
 					else if (event.key.keysym.sym == SDLK_a) {
 						cam.DeactivateKey(MOVEMENT_DIRECTION::LEFT);
 					}
+					else if (event.key.keysym.sym == SDLK_l) {
+						draw_wireframe = !draw_wireframe;
+					}
 					break;
 
 				case SDL_MOUSEMOTION:
@@ -151,7 +155,7 @@ void Application::Run() {
 
 		// Render
 		{
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			draw_wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			for (size_t i = 0; i < 16; ++i) {
 
