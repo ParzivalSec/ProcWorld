@@ -2,4 +2,4 @@
 
 ## Procedural Geometry (Marching cubes algorithm)
 
-![alt text](https://raw.githubusercontent.com/ParzivalSec/ProcWorld/master/Progress/Pillars_with_noise_flat "Wireframe procedural mesh")
+![alt text](https://raw.githubusercontent.com/ParzivalSec/ProcWorld/master/Progress/Pillars_with_noise_flat.png "Wireframe procedural mesh")
