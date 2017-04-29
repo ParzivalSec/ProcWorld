@@ -10,6 +10,7 @@
 #include "GeometryPass.h"
 #include <gtc/matrix_transform.inl>
 #include "GPUNoise.h"
+#include <iostream>
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -43,7 +44,7 @@ void Application::Run() {
 	clock.StartTimer();
 	duration<float> lastFrame(0), currentFrame(0);
 
-	OpenGLRenderer::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	OpenGLRenderer::ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
 	Camera cam(glm::vec3(0, 0, 0), glm::vec3(0, 0, -50), glm::vec3(0, 1, 0), 
 		45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
@@ -73,6 +74,11 @@ void Application::Run() {
 	GeometryPass geometryPass;
 	geometryPass.SetupResources(assMng);
 	geometryPass.GenerateGeometry(densityPass);
+
+	// TODO: Refactor aset manager to use a PackedArray
+	Texture rockTexture = assMng.LoadTexture("rock.jpg", "rock");
+	Texture mossTexture = assMng.LoadTexture("moss.jpg", "moss");
+	Texture sandTexture = assMng.LoadTexture("sand.jpg", "sand");
 
 	bool draw_wireframe = false;
 	duration<float> average_deltaTime;
@@ -164,8 +170,28 @@ void Application::Run() {
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "projection", cam.GetProjectionMat());
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f)));
 
+				// Bind textures
+				// TODO: If pixel shader displ. mapping works, refactor this here
+				// Maybe use some BindTextureToUnit() function
+				GLuint texLoc = glGetUniformLocation(prg.m_id, "mossTexture");
+				glUniform1i(texLoc, 0);
+
+				texLoc = glGetUniformLocation(prg.m_id, "rockTexture");
+				glUniform1i(texLoc, 1);
+
+				texLoc = glGetUniformLocation(prg.m_id, "sandTexture");
+				glUniform1i(texLoc, 2);
+				
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, mossTexture.textureID);
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, rockTexture.textureID);
+
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, sandTexture.textureID);
+
 				OpenGLRenderer::BindVertexArray(geometryPass.m_sliceVAOs[i]);
-				// OpenGLRenderer::Draw(GL_TRIANGLES, 0, 3);
 				glDrawArraysInstanced(GL_TRIANGLES, 0, geometryPass.m_vericesPerSlice[i] * 6, 1);
 				OpenGLRenderer::UnbindVertexArray();
 			}

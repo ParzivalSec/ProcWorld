@@ -1,6 +1,7 @@
 ﻿#include "AssetManager.h"
 #include <filesystem>
 #include <iostream>
+#include "Soil.h"
 
 AssetManager::AssetManager() {
 	m_listening = true;
@@ -10,6 +11,43 @@ AssetManager::AssetManager() {
 ShaderProgram& AssetManager::AddShaderSet(std::string programName) {
 	auto it = m_programs.insert(std::make_pair(programName, ShaderProgram()));
 	return it.first->second;
+}
+
+Texture& AssetManager::LoadTexture(std::string fileName, std::string assetName)
+{
+	if (m_textures.find(assetName) == m_textures.end())
+	{
+		std::string texturePath(fileName);
+		texturePath = "./data/textures/" + texturePath;
+
+		Texture texture;
+		glGenTextures(1, &texture.textureID);
+		glBindTexture(GL_TEXTURE_2D, texture.textureID);
+		int width, height;
+		unsigned char* image = SOIL_load_image(texturePath.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		SOIL_free_image_data(image);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		m_textures.insert({ assetName, texture });
+	}
+
+	return m_textures.at(assetName);
+}
+
+Texture* AssetManager::GetTextureByName(std::string textureName)
+{
+	if (m_textures.find(textureName) == m_textures.end())
+	{
+		return &m_textures.at(textureName);
+	}
+	return nullptr;
 }
 
 void AssetManager::ShaderWatcher() {

@@ -132,8 +132,8 @@ float pattern(in vec2 p) {
 float pattern2( in vec2 p, out vec2 q, out vec2 r , in float time)
 {
     float l = 2.3;
-    float g = 0.4;
-    int oc = 5; 
+    float g = 0.99;
+    int oc = 2; 
      
     q.x = fbm( p + vec2(time,time),oc,l,g);
     q.y = fbm( p + vec2(5.2*time,1.3*time) ,oc,l,g);
@@ -164,6 +164,6 @@ void main()
 {
 	vec2 output1;
 	vec2 output2;
-	float noise = pattern2(frag.uv.xz, output1, output2, 0.001f * frag.instance_id);
+	float noise = pattern2(frag.uv.xz, output1, output2, 0.01f * frag.instance_id);
 	color = vec4(noise, 0, 0, 0);
 }
