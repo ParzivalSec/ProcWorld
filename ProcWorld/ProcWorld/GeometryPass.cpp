@@ -169,7 +169,7 @@ void GeometryPass::SetupMarchinCubeShader(AssetManager& assetManager)
 
 	m_shaderProgram = m_cubes_prg.m_id;
 
-	const GLchar* feedbackVaryings[] = { "position", "color"};
+	const GLchar* feedbackVaryings[] = { "position", "normal"};
 	glTransformFeedbackVaryings(m_shaderProgram, 2, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
 
 	m_cubes_prg.Link();
