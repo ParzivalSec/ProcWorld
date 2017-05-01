@@ -126,15 +126,17 @@ void GeometryPass::GenerateSliceBuffers(void)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_sliceTBOs[i]);
 		// TODO: Determine how much data I really need to size the VBOs (definitely not 43700)
-		glBufferData(GL_ARRAY_BUFFER, 288800 * 3 * sizeof(float), nullptr, GL_STATIC_READ);
+		glBufferData(GL_ARRAY_BUFFER, 433200 * 3 * sizeof(float), nullptr, GL_STATIC_READ);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		OpenGLRenderer::BindVertexArray(m_sliceVAOs[i]);
 			OpenGLRenderer::BindVertexBuffer(m_sliceTBOs[i]);
 			OpenGLRenderer::EnableVertexAttribute(0);
-			OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+			OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), nullptr);
 			OpenGLRenderer::EnableVertexAttribute(1);
-			OpenGLRenderer::LinkVertexAttribute(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+			OpenGLRenderer::LinkVertexAttribute(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+			OpenGLRenderer::EnableVertexAttribute(2);
+			OpenGLRenderer::LinkVertexAttribute(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (GLvoid*)(6 * sizeof(float)));
 		OpenGLRenderer::UnbindVertexArray();
 	}
 }
@@ -169,8 +171,8 @@ void GeometryPass::SetupMarchinCubeShader(AssetManager& assetManager)
 
 	m_shaderProgram = m_cubes_prg.m_id;
 
-	const GLchar* feedbackVaryings[] = { "position", "normal"};
-	glTransformFeedbackVaryings(m_shaderProgram, 2, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+	const GLchar* feedbackVaryings[] = { "position", "normal", "tangent" };
+	glTransformFeedbackVaryings(m_shaderProgram, 3, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
 
 	m_cubes_prg.Link();
 }

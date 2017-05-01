@@ -11,6 +11,7 @@
 #include <gtc/matrix_transform.inl>
 #include "GPUNoise.h"
 #include <iostream>
+#include "Cube.h"
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -46,13 +47,18 @@ void Application::Run() {
 
 	OpenGLRenderer::ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-	Camera cam(glm::vec3(0, 0, 0), glm::vec3(0, 0, -50), glm::vec3(0, 1, 0), 
+	Camera cam(glm::vec3(0, 0, -50), glm::vec3(0, 20, 100), glm::vec3(0, 1, 0), 
 		45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 	AssetManager assMng;
-	ShaderProgram& prg = assMng.AddShaderSet("Test");
+	ShaderProgram& prg = assMng.AddShaderSet("Color");
 	prg.AddShaders(GL_VERTEX_SHADER, "Color.vert", GL_FRAGMENT_SHADER, "Color.frag");
 	prg.Link();
+
+	ShaderProgram& cubePrg = assMng.AddShaderSet("CubeShader");
+	cubePrg.AddShaders(GL_VERTEX_SHADER, "CubeParallax.vert", GL_FRAGMENT_SHADER, "CubeParallax.frag");
+	cubePrg.Link();
+	GLuint cubeVAO = Cube::CreateCubeVAO();
 
 	ShaderProgram& density = assMng.AddShaderSet("Density");
 	density.AddShaders(GL_VERTEX_SHADER, "build_density_tex.vert",
@@ -77,10 +83,37 @@ void Application::Run() {
 
 	// TODO: Refactor aset manager to use a PackedArray
 	Texture rockTexture = assMng.LoadTexture("rock.jpg", "rock");
-	Texture mossTexture = assMng.LoadTexture("moss.jpg", "moss");
+	Texture mossTexture = assMng.LoadTexture("crate.jpg.png", "moss");
 	Texture sandTexture = assMng.LoadTexture("sand.jpg", "sand");
 
+	// INFO: Load height maps
+	Texture rockHeightMap = assMng.LoadTexture("rock_height.png", "rock_height_map");
+	Texture mossHeightMap = assMng.LoadTexture("crate_height.png", "moss_height_map");
+	Texture sandHeightMap = assMng.LoadTexture("sand_height.png", "sand_height_map");
+
+	// INFO: Load normal maps
+	Texture rockNormalMap = assMng.LoadTexture("rock_normals.png", "rock_normal_map");
+	Texture mossNormalMap = assMng.LoadTexture("crate_normal.png", "moss_normal_map");
+	Texture sandNormalMap = assMng.LoadTexture("sand_normals.png", "sand_normal_map");
+	
+
+	Texture diffuseCrate = assMng.LoadTexture("crate.jpg.png", "cube_diffuse");
+	Texture heightCrate = assMng.LoadTexture("crate_height.png", "cube_height");
+	Texture normalMapCrate = assMng.LoadTexture("crate_normals.png", "cube_normal");
+
+	Texture diffuseWall = assMng.LoadTexture("wall.png", "wall_diffuse");
+	Texture heightWall = assMng.LoadTexture("wall_height.png", "wall_height");
+	Texture normalMapWall = assMng.LoadTexture("wall_normals.png", "wall_normal");
+
+	Texture diffuseBricks = assMng.LoadTexture("bricks2.jpg", "brick_diffuse");
+	Texture heightBricks = assMng.LoadTexture("bricks2_disp.jpg", "brick_height");
+	Texture normalMapBricks = assMng.LoadTexture("bricks2_normal.jpg", "brick_normal");
+
 	bool draw_wireframe = false;
+	int initialSteps = 16;
+	int refinementSteps = 8;
+	bool tweakInitialSteps = true;
+
 	duration<float> average_deltaTime;
 	int fpsCounter = 0;
 	while (running) {
@@ -134,6 +167,10 @@ void Application::Run() {
 					else if (event.key.keysym.sym == SDLK_l) {
 						draw_wireframe = !draw_wireframe;
 					}
+					else if (event.key.keysym.sym == SDLK_p)
+					{
+						tweakInitialSteps = !tweakInitialSteps;
+					}
 					break;
 
 				case SDL_MOUSEMOTION:
@@ -142,6 +179,24 @@ void Application::Run() {
 					cam.ProcessMotion(deltaX * dt.count(), deltaY * dt.count());
 					SDL_WarpMouseInWindow(m_applicationWindow.get(), 600, 400);
 					break;
+
+				case SDL_MOUSEWHEEL:
+					if (event.wheel.y >= 0)
+					{
+						tweakInitialSteps ? ++initialSteps : ++refinementSteps;
+						initialSteps > 24 ? initialSteps = 24 : void(1);
+						refinementSteps > 24 ? refinementSteps = 24 : void(1);
+
+						std::cout << "Steps: " << initialSteps << " / " << refinementSteps << std::endl;
+					}
+					else
+					{
+						tweakInitialSteps ? --initialSteps : --refinementSteps;
+						initialSteps < 1 ? initialSteps = 1 : void(1);
+						refinementSteps < 1 ? refinementSteps = 1 : void(1);
+
+						std::cout << "Steps: " << initialSteps << " / " << refinementSteps << std::endl;
+					}
 
 				default:
 					break;
@@ -169,6 +224,13 @@ void Application::Run() {
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "view", cam.GetViewMat());
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "projection", cam.GetProjectionMat());
 				OpenGLRenderer::SetUniformMatrix4fv(prg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f)));
+				OpenGLRenderer::SetUniformVector3(prg.m_id, "eyeWorldPosition", cam.GetPosition());
+
+				GLuint attrLocation = glGetUniformLocation(prg.m_id, "initialSteps");
+				glUniform1i(attrLocation, initialSteps);
+
+				attrLocation = glGetUniformLocation(prg.m_id, "refinementSteps");
+				glUniform1i(attrLocation, refinementSteps);
 
 				// Bind textures
 				// TODO: If pixel shader displ. mapping works, refactor this here
@@ -181,6 +243,24 @@ void Application::Run() {
 
 				texLoc = glGetUniformLocation(prg.m_id, "sandTexture");
 				glUniform1i(texLoc, 2);
+
+				texLoc = glGetUniformLocation(prg.m_id, "mossHeightMap");
+				glUniform1i(texLoc, 3);
+
+				texLoc = glGetUniformLocation(prg.m_id, "rockHeightMap");
+				glUniform1i(texLoc, 4);
+
+				texLoc = glGetUniformLocation(prg.m_id, "sandHeightMap");
+				glUniform1i(texLoc, 5);
+
+				texLoc = glGetUniformLocation(prg.m_id, "mossNormalMap");
+				glUniform1i(texLoc, 6);
+
+				texLoc = glGetUniformLocation(prg.m_id, "rockNormalMap");
+				glUniform1i(texLoc, 7);
+
+				texLoc = glGetUniformLocation(prg.m_id, "sandNormalMap");
+				glUniform1i(texLoc, 8);
 				
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, mossTexture.textureID);
@@ -191,10 +271,93 @@ void Application::Run() {
 				glActiveTexture(GL_TEXTURE2);
 				glBindTexture(GL_TEXTURE_2D, sandTexture.textureID);
 
+				glActiveTexture(GL_TEXTURE3);
+				glBindTexture(GL_TEXTURE_2D, mossHeightMap.textureID);
+
+				glActiveTexture(GL_TEXTURE4);
+				glBindTexture(GL_TEXTURE_2D, rockHeightMap.textureID);
+
+				glActiveTexture(GL_TEXTURE5);
+				glBindTexture(GL_TEXTURE_2D, sandHeightMap.textureID);
+
+				glActiveTexture(GL_TEXTURE6);
+				glBindTexture(GL_TEXTURE_2D, mossNormalMap.textureID);
+
+				glActiveTexture(GL_TEXTURE7);
+				glBindTexture(GL_TEXTURE_2D, rockNormalMap.textureID);
+
+				glActiveTexture(GL_TEXTURE8);
+				glBindTexture(GL_TEXTURE_2D, sandNormalMap.textureID);
+
 				OpenGLRenderer::BindVertexArray(geometryPass.m_sliceVAOs[i]);
 				glDrawArraysInstanced(GL_TRIANGLES, 0, geometryPass.m_vericesPerSlice[i] * 6, 1);
 				OpenGLRenderer::UnbindVertexArray();
 			}
+		}
+
+		// INFO: Draw cube to test parallax
+		{
+			OpenGLRenderer::UseShader(cubePrg.m_id);
+			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "view", cam.GetViewMat());
+			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "projection", cam.GetProjectionMat());
+			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f)));
+			OpenGLRenderer::SetUniformVector3(cubePrg.m_id, "eyePosition", cam.GetPosition());
+
+			GLuint attrLocation = glGetUniformLocation(cubePrg.m_id, "initialSteps");
+			glUniform1i(attrLocation, initialSteps);
+
+			attrLocation = glGetUniformLocation(cubePrg.m_id, "refinementSteps");
+			glUniform1i(attrLocation, refinementSteps);
+
+			GLuint texLoc = glGetUniformLocation(cubePrg.m_id, "diffuse");
+			glUniform1i(texLoc, 0);
+			texLoc = glGetUniformLocation(cubePrg.m_id, "height");
+			glUniform1i(texLoc, 1);
+			texLoc = glGetUniformLocation(cubePrg.m_id, "normalMap");
+			glUniform1i(texLoc, 2);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, diffuseCrate.textureID);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, heightCrate.textureID);
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, normalMapCrate.textureID);
+
+			Cube::DrawCube(cubeVAO);
+
+			glm::mat4 model_second = glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, 0.0f, -10.0f)); 
+			model_second = glm::rotate(model_second, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			model_second = glm::scale(model_second, glm::vec3(10.0f, 10.0f, 10.0f));
+			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", model_second);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, diffuseWall.textureID);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, heightWall.textureID);
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, normalMapWall.textureID);
+
+			Cube::DrawCube(cubeVAO);
+
+			glm::mat4 model_third = glm::translate(glm::mat4(1.0f), glm::vec3(20.0f, 0.0f, -10.0f));
+			model_third = glm::rotate(model_third, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			model_third = glm::scale(model_third, glm::vec3(10.0f, 10.0f, 10.0f));
+			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", model_third);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, diffuseBricks.textureID);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, heightBricks.textureID);
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, normalMapBricks.textureID);
+
+			Cube::DrawCube(cubeVAO);
 		}
 
 		SDL_GL_SwapWindow(m_applicationWindow.get());

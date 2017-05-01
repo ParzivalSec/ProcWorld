@@ -61,30 +61,30 @@ void main()
     
     f += fingers;
 	
-	// Wrap and setof ws coordinates
-	#define PRENOISE_FREQ_MULT 0.005 //0.005
-	#define PRENOISE_AMP_MULT  1.5   //3.5
+	// // Wrap and setof ws coordinates
+	// #define PRENOISE_FREQ_MULT 0.005 //0.005
+	// #define PRENOISE_AMP_MULT  1.5   //3.5
 	
-	vec4 distortedInput = data.tex_coords * PRENOISE_FREQ_MULT;
+	// vec4 distortedInput = data.tex_coords * PRENOISE_FREQ_MULT;
 	
-	float noise =  texture(perlin_noise, distortedInput.xyz).x;
-	vec3 wsCoordsWarped;
-	wsCoordsWarped.x = 0.25f * noise * distortedInput.x;
-	wsCoordsWarped.y = 0.25f * noise * distortedInput.y;
-	wsCoordsWarped.z = 0.25f * noise * distortedInput.z;
+	// float noise =  texture(perlin_noise, distortedInput.xyz).x;
+	// vec3 wsCoordsWarped;
+	// wsCoordsWarped.x = 0.25f * noise * distortedInput.x;
+	// wsCoordsWarped.y = 0.25f * noise * distortedInput.y;
+	// wsCoordsWarped.z = 0.25f * noise * distortedInput.z;
 	
-	// gopher holes/slices:
-  {
-    vec3 octaveCoord = wsCoordsWarped * vec3(0.5f, 0.8f, 0.7f).xyz; 
-    float t = texture(perlin_noise, octaveCoord.xyz*0.05).x;
-    float z = 0.6*(1-0.15f);
-    t = clamp(t*(1+z) - z, 0.0f, 1.0f);
-    t = t*t*(3 - 2*t);   // ENORMOUSLY BETTER
-    float dqq = -clamp(t*t*10, 0.0f, 1.0f)*0.3;  // so it doesn't emaciate the pillars
-    f += dqq * 0.8f * 0.4;
-  }
+	// // gopher holes/slices:
+  // {
+    // vec3 octaveCoord = wsCoordsWarped * vec3(0.5f, 0.8f, 0.7f).xyz; 
+    // float t = texture(perlin_noise, octaveCoord.xyz*0.05).x;
+    // float z = 0.6*(1-0.15f);
+    // t = clamp(t*(1+z) - z, 0.0f, 1.0f);
+    // t = t*t*(3 - 2*t);   // ENORMOUSLY BETTER
+    // float dqq = -clamp(t*t*10, 0.0f, 1.0f)*0.3;  // so it doesn't emaciate the pillars
+    // f += dqq * 0.8f * 0.4;
+  // }
   
-  	float noise_2 =  texture(perlin_noise, vec3(data.instance_id * 0.25f, data.instance_id * 0.33f, data.instance_id * 0.75f)).x;
-	f += noise_2 * 0.25f;
+  	// float noise_2 =  texture(perlin_noise, vec3(data.instance_id * 0.25f, data.instance_id * 0.33f, data.instance_id * 0.75f)).x;
+	// f += noise_2 * 0.25f;
 	
 	color = vec4(f, 0, 0, 0);}

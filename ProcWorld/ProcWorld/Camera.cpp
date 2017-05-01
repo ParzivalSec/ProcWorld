@@ -84,6 +84,11 @@ const glm::mat4& Camera::GetProjectionMat() const {
 	return m_projectionMat;
 }
 
+const glm::vec3& Camera::GetPosition() const
+{
+	return m_position;
+}
+
 void Camera::UpdateRotation() {
 	// Quaternion version
 	glm::quat q = glm::angleAxis(glm::radians(-m_pitch), glm::vec3(1.0f, 0.0f, 0.0f));

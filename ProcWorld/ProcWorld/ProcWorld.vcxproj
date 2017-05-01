@@ -171,6 +171,7 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="DensityPass.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="GeometryPass.h" />
