@@ -17,7 +17,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 worldUp,
 	, m_position(position)
 	, m_rotation(glm::quat())
 	, m_speed(20.0f)
-	, m_sensitivity(25.0f)
+	, m_sensitivity(10.0f)
 	, m_yaw(0.0f)
 	, m_pitch(0.0f)
 	, m_worldUp(worldUp)

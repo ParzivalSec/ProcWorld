@@ -37,6 +37,9 @@
     <Filter Include="LUTs">
       <UniqueIdentifier>{a1296784-a2a6-4103-9aa3-e007147f6e73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\ParticleSystem">
+      <UniqueIdentifier>{4672a713-99d4-4bfc-9933-1430d51237cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -72,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="GPUNoise.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Graphics\ParticleSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,6 +122,13 @@
     </ClInclude>
     <ClInclude Include="GPUNoise.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Graphics\ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Graphics\ParticleSystem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

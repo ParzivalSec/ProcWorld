@@ -79,6 +79,8 @@ void GeometryPass::GenerateGeometry(DensityPass& densityPass)
 		OpenGLRenderer::UnbindVertexArray();
 		glGetQueryObjectuiv(m_query, GL_QUERY_RESULT, &m_vericesPerSlice[i]);
 		printf("Primites genereated: %d \n", m_vericesPerSlice[i]);
+
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, 0);
 	}
 
 	glFlush();

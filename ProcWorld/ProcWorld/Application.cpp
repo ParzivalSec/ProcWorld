@@ -12,6 +12,8 @@
 #include "GPUNoise.h"
 #include <iostream>
 #include "Cube.h"
+#include "Particle.h"
+#include "ParticleSystem.h"
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -108,6 +110,10 @@ void Application::Run() {
 	Texture diffuseBricks = assMng.LoadTexture("bricks2.jpg", "brick_diffuse");
 	Texture heightBricks = assMng.LoadTexture("bricks2_disp.jpg", "brick_height");
 	Texture normalMapBricks = assMng.LoadTexture("bricks2_normal.jpg", "brick_normal");
+
+	Particles::System particleSystem(glm::vec3(0.0f, 0.0f, 0.0f), 20.0f);
+	particleSystem.SetupRenderShader(assMng);
+	particleSystem.SetupUpdateShader(assMng);
 
 	bool draw_wireframe = false;
 	int initialSteps = 16;
@@ -208,11 +214,14 @@ void Application::Run() {
 		cam.ProcessMovement(dt.count());
 		// Update & render section
 		Update(dt.count());
+		particleSystem.Tick(dt.count());
 
 		OpenGLRenderer::ViewPort(0, 0, m_windowWidth, m_windowHeight);
 		OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
+
+		glPointSize(10.0f);
 
 		// Render
 		{
@@ -359,6 +368,9 @@ void Application::Run() {
 
 			Cube::DrawCube(cubeVAO);
 		}
+
+		// INFO: Draw Particles
+		particleSystem.Render(glm::mat4(1.0f), cam.GetViewMat(), cam.GetProjectionMat());
 
 		SDL_GL_SwapWindow(m_applicationWindow.get());
 

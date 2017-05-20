@@ -1,0 +1,270 @@
+#pragma once
+#include <detail/type_vec3.hpp>
+
+namespace Particles
+{
+	struct Particle
+	{
+		glm::vec3 position;
+		glm::vec3 velocity;
+		float lifeTime;
+		int type;
+	};
+}
+
+
+// ParticleSystem.hpp
+
+#pragma once
+
+#include <glm.hpp>
+#include <GL/glew.h>
+#include "Particle.h"
+
+class AssetManager;
+
+namespace Particles
+{
+	class System
+	{
+	public:
+		System();
+		System(glm::vec3 emitterLocation, float emitterTTL);
+
+		void ConfigureSmokeParticle(float frequency, float ttl);
+		void ConfigureRocketParticle(float frequencyMin, float frequencyMax, float ttl, int amount);
+		void ConfigureFireworkParticle(int amount, float ttl);
+
+		void Tick(float deltaTime);
+		void Render(const glm::mat4& view, const glm::mat4& projection, const glm::mat4& model);
+
+		void SetupUpdateShader(AssetManager& assetManager);
+		void SetupRenderShader(AssetManager& assetManager);
+
+		~System();
+
+	private:
+
+		void SetupBuffers(void);
+
+		//// Smoke parameters
+		float m_smokeFrequency;
+		float m_smokeAccumulator;
+		float m_smokeTTL;
+
+		//// Rocket parameters
+		float m_rocketFrequencyMin;
+		float m_rocketFrequencyMax;
+		float m_rocketAccumulator;
+		float m_rocketTTL;
+		int m_rocketAmount;
+
+		//// Firework parameters
+		int m_fireworkAmount;
+		float m_fireworkTTL;
+
+		// Particle Amount
+		GLuint m_particleCount;
+		GLuint m_generatedParticles;
+		Particle m_particles[10];
+
+		// General system settings
+		glm::vec3 m_emitterLocation;
+		GLuint m_VBO[2];
+		GLuint m_VAO[2];
+		GLuint m_query;
+		// Shader programs
+		GLuint m_updateShader;
+		GLuint m_renderShader;
+
+		Particle m_emitter;
+
+		int m_activeBuffer;
+	};
+}
+
+// Usage
+// ParticleSystemRegistry reg;
+// Particle::System aSystem(Location, Amount, TTL);
+// reg.Add(aSystem)
+
+// Somwehere else
+// reg.Tick();
+// --> Internally calls system.Tick() for every Particles::System
+
+// Later 
+// reg.Render();
+// --> Internally calls system.Render() for every Particles::System
+
+// 
+
+#include "ParticleSystem.h"
+#include "ShaderProgram.h"
+#include "AssetManager.h"
+#include "OpenGLRenderer.h"
+#include "Particle.h"
+
+Particles::System::System() {}
+
+Particles::System::System(glm::vec3 emitterLocation, float emitterTTL)
+	: m_smokeFrequency(1.0f)
+	, m_smokeAccumulator(0.0f)
+	, m_smokeTTL(3.0f)
+	, m_rocketFrequencyMin(2.0f)
+	, m_rocketFrequencyMax(4.0f)
+	, m_rocketAccumulator(0.0f)
+	, m_rocketTTL(3.0f)
+	, m_rocketAmount(4.0f)
+	, m_fireworkAmount(5.0f)
+	, m_fireworkTTL(1.5f)
+	, m_particleCount(1)
+	, m_emitterLocation(emitterLocation)
+	, m_VBO{0, 0}
+	, m_VAO{0, 0}
+	, m_query(0)
+	, m_updateShader(0)
+	, m_renderShader(0)
+	, m_activeBuffer(0)
+{
+	SetupBuffers();
+
+	m_emitter.position = glm::vec3(0.0f, 0.0f, -10.0f);
+	m_emitter.velocity = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_emitter.lifeTime = 10.0f;
+	m_emitter.type = 0;
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO[0]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Particle), &m_emitter);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void Particles::System::ConfigureSmokeParticle(float frequency, float ttl)
+{
+	
+}
+
+
+void Particles::System::ConfigureRocketParticle(float frequencyMin, float frequencyMax, float ttl, int amount)
+{
+	
+}
+
+
+void Particles::System::ConfigureFireworkParticle(int amount, float ttl)
+{
+	
+}
+
+void Particles::System::Tick(float deltaTime)
+{
+	glEnable(GL_RASTERIZER_DISCARD);
+	OpenGLRenderer::UseShader(m_updateShader);
+
+	//// Set uniforms for the update shader
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "SmokeFrequency", m_smokeFrequency);
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "SmokeAccumulator", m_smokeAccumulator);
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "SmokeLifetimeInitial", m_smokeTTL);
+
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "RocketFrequencyMin", m_rocketFrequencyMin);
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "RocketFrequencyMax", m_rocketFrequencyMax);
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "RocketAccumulator", m_rocketAccumulator);
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "RocketLifetimeInitial", m_rocketTTL);
+	//GLuint attrLocation = glGetUniformLocation(m_updateShader, "RocketAmount");
+	//glUniform1i(attrLocation, m_rocketAmount);
+
+	//attrLocation = glGetUniformLocation(m_updateShader, "FireworkAmount");
+	//glUniform1i(attrLocation, m_fireworkAmount);
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "FireworkLifetimeInitial", m_fireworkTTL);
+
+	//OpenGLRenderer::SetUniformFloat(m_updateShader, "DeltaTime", deltaTime);
+	//OpenGLRenderer::SetUniformVector3(m_updateShader, "RandomSeed", glm::vec3(1.0f, 2.0f, 4.0f));
+
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK, 0, m_VBO[1]);
+
+	OpenGLRenderer::BindVertexArray(m_VAO[0]);
+		glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, m_query);
+		glBeginTransformFeedback(GL_POINTS);
+			glDrawArrays(GL_POINTS, 0, m_particleCount);
+		glEndTransformFeedback();
+		glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
+	OpenGLRenderer::UnbindVertexArray();
+	glGetQueryObjectuiv(m_query, GL_QUERY_RESULT, &m_generatedParticles);
+	printf("Particles generated: %d \n", m_generatedParticles);
+	m_particleCount += m_generatedParticles;
+
+	glFlush();
+	glDisable(GL_RASTERIZER_DISCARD);
+
+	// Update uniforms
+	//m_smokeAccumulator += deltaTime;
+	//m_smokeAccumulator > m_smokeFrequency ? m_smokeAccumulator = 0.0f : void(0);
+
+	//m_rocketAccumulator += deltaTime;
+	//m_rocketAccumulator > m_rocketAccumulator ? m_rocketAccumulator = 0.0f : void(0);
+}
+
+
+void Particles::System::Render(const glm::mat4& view, const glm::mat4& projection, const glm::mat4& model)
+{
+	OpenGLRenderer::UseShader(m_renderShader);
+	OpenGLRenderer::SetUniformMatrix4fv(m_renderShader, "view", view);
+	OpenGLRenderer::SetUniformMatrix4fv(m_renderShader, "projection", projection);
+	OpenGLRenderer::SetUniformMatrix4fv(m_renderShader, "model", glm::mat4(1.0f));
+
+	OpenGLRenderer::BindVertexArray(m_VAO[1]);
+		glDrawArrays(GL_POINTS, 0, m_particleCount);
+	OpenGLRenderer::UnbindVertexArray();
+}
+
+void Particles::System::SetupUpdateShader(AssetManager& assetManager)
+{
+	ShaderProgram& updatePrg = assetManager.AddShaderSet("Particle_System_Update");
+	updatePrg.AddShaders(GL_VERTEX_SHADER, "UpdateParticles.vert", GL_GEOMETRY_SHADER, "UpdateParticles.geom");
+
+	m_updateShader = updatePrg.m_id;
+
+	const GLchar* feedbackVaryings[] = { "outPosition", "outVelocity", "outLifeTime", "outType" };
+	glTransformFeedbackVaryings(m_updateShader, 4, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+
+	updatePrg.Link();
+}
+
+void Particles::System::SetupRenderShader(AssetManager& assetManager)
+{
+	ShaderProgram& renderPrg = assetManager.AddShaderSet("Particle_System_Render");
+	renderPrg.AddShaders(GL_VERTEX_SHADER, "RenderParticles.vert", GL_FRAGMENT_SHADER, "RenderParticles.frag");
+
+	m_renderShader = renderPrg.m_id;
+	renderPrg.Link();
+}
+
+void Particles::System::SetupBuffers()
+{
+	glGenQueries(1, &m_query);
+	glGenBuffers(2, m_VBO);
+	glGenVertexArrays(2, m_VAO);
+
+	// Resize the transform feedback buffers to hold the vertex datat to generate
+	for (size_t i = 0; i < 2; ++i)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBO[i]);
+		// TODO: Determine how much data I really need to size the VBOs (definitely not 100000)
+		glBufferData(GL_ARRAY_BUFFER, 100000 * sizeof(Particle), nullptr, GL_STATIC_READ);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		OpenGLRenderer::BindVertexArray(m_VAO[i]);
+		OpenGLRenderer::BindVertexBuffer(m_VBO[i]);
+			OpenGLRenderer::EnableVertexAttribute(0);
+				OpenGLRenderer::LinkVertexAttribute(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float) + 1 * sizeof(int), nullptr);
+			OpenGLRenderer::EnableVertexAttribute(1);
+				OpenGLRenderer::LinkVertexAttribute(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float) + 1 * sizeof(int), (GLvoid*)(3 * sizeof(float)));
+			OpenGLRenderer::EnableVertexAttribute(2);
+				OpenGLRenderer::LinkVertexAttribute(2, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float) + 1 * sizeof(int), (GLvoid*)(6 * sizeof(float)));
+			OpenGLRenderer::EnableVertexAttribute(3);
+				OpenGLRenderer::LinkVertexAttribute(3, 1, GL_INT, GL_FALSE, 7 * sizeof(float) + 1 * sizeof(int), (GLvoid*)(7 * sizeof(float)));
+		OpenGLRenderer::UnbindVertexArray();
+	}
+}
+
+Particles::System::~System() {}

@@ -163,6 +163,7 @@
     <ClCompile Include="GPUNoise.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenGLRenderer.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -178,6 +179,8 @@
     <ClInclude Include="GPUNoise.h" />
     <ClInclude Include="mc_cases_lut.h" />
     <ClInclude Include="OpenGLRenderer.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="SDLWrapper.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
