@@ -46,5 +46,10 @@ namespace Particles
 		float m_fireworkTTL;
 
 		int m_currentBuffer;
+
+		GLuint m_box;
+		GLuint m_smokeTexture;
+		GLuint m_rocketTexture;
+		GLuint m_sparkliesTexture;
 	};
 }

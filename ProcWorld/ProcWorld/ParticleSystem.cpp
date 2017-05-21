@@ -74,6 +74,11 @@ void Particles::System::SetupRenderShader(AssetManager& assetManager)
 	{
 		m_renderShader = assetManager.GetShaderByName("Particle_Render_Shader")->m_id;
 	}
+
+	m_box = assetManager.LoadTexture("box.png", "box").textureID;
+	m_smokeTexture = assetManager.LoadTexture("smoke.png", "smoke").textureID;
+	m_rocketTexture = assetManager.LoadTexture("rocket.png", "rocket").textureID;
+	m_sparkliesTexture = assetManager.LoadTexture("sparklies.png", "sparklies").textureID;
 }
 
 void Particles::System::SetupUpdateShader(AssetManager& assetManager)
@@ -170,9 +175,35 @@ void Particles::System::Render(const glm::mat4& model, const glm::mat4& view, co
 	uniformLocation = glGetUniformLocation(m_renderShader, "projection");
 	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(projection));
 
-	glBindVertexArray(m_VAO[m_currentBuffer]);
-		glDrawArrays(GL_POINTS, 0, m_particleCount);
-	glBindVertexArray(0);
+	GLuint texLoc = glGetUniformLocation(m_renderShader, "smoke");
+	glUniform1i(texLoc, 0);
+	texLoc = glGetUniformLocation(m_renderShader, "rocket");
+	glUniform1i(texLoc, 1);
+	texLoc = glGetUniformLocation(m_renderShader, "sparklies");
+	glUniform1i(texLoc, 2);
+	texLoc = glGetUniformLocation(m_renderShader, "box");
+	glUniform1i(texLoc, 3);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_smokeTexture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_rocketTexture);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_sparkliesTexture);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_box);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glBindVertexArray(m_VAO[m_currentBuffer]);
+			glDrawArrays(GL_POINTS, 0, m_particleCount);
+		glBindVertexArray(0);
+
+	glDisable(GL_BLEND);
 
 	m_currentBuffer = 1 - m_currentBuffer;
 }

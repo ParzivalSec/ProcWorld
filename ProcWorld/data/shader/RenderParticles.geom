@@ -22,9 +22,13 @@ void main()
 	
 	if (particle[0].type == 1) 
 	{
-		particleSize = 3.0f;
+		particleSize = 1.0f;
 	}
-	else
+	else if (particle[0].type == 3)
+	{
+		particleSize = 0.5f;
+	}
+	else 
 	{
 		particleSize = 1.0f;
 	}
@@ -33,28 +37,28 @@ void main()
 	vec4 pos = vec4(particle[0].position, 1.0f);
 	
 	// Left bottom point of billboard quad => a
-	vec2 a = pos.xy + vec2(-0.5, -0.5) * particleSize;
+	vec2 a = pos.xy + vec2(-0.5, 0) * particleSize;
 	gl_Position = projection * vec4(a, pos.zw);
 	uv = vec2(0.0f, 0.0f);
 	type = particle[0].type;
 	EmitVertex();
 	
 	// Left top point -> b
-	vec2 b = pos.xy + vec2(-0.5, 0.5) * particleSize;
+	vec2 b = pos.xy + vec2(-0.5, 1) * particleSize;
 	gl_Position = projection * vec4(b, pos.zw);
 	uv = vec2(0.0f, 1.0f);
 	type = particle[0].type;
 	EmitVertex();
 	
 	// Right bottom -> d
-	vec2 d = pos.xy + vec2(0.5, -0.5) * particleSize;
+	vec2 d = pos.xy + vec2(0.5, 0) * particleSize;
 	gl_Position = projection * vec4(d, pos.zw);
 	uv = vec2(1.0f, 0.0f);
 	type = particle[0].type;
 	EmitVertex();
 	
 	// Right top -> c
-	vec2 c = pos.xy + vec2(0.5, 0.5) * particleSize;
+	vec2 c = pos.xy + vec2(0.5, 1) * particleSize;
 	gl_Position = projection * vec4(c, pos.zw);
 	uv = vec2(1.0f, 1.0f);
 	type = particle[0].type;

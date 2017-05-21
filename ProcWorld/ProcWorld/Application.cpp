@@ -120,14 +120,14 @@ void Application::Run() {
 	Texture sandTexture = assMng.LoadTexture("sand.jpg", "sand");
 
 	// INFO: Load height maps
-	Texture rockHeightMap = assMng.LoadTexture("rock_height.png", "rock_height_map");
+	Texture rockHeightMap = assMng.LoadTexture("rock_height.jpg", "rock_height_map");
 	Texture mossHeightMap = assMng.LoadTexture("crate_height.png", "moss_height_map");
-	Texture sandHeightMap = assMng.LoadTexture("sand_height.png", "sand_height_map");
+	Texture sandHeightMap = assMng.LoadTexture("sand_height.jpg", "sand_height_map");
 
 	// INFO: Load normal maps
-	Texture rockNormalMap = assMng.LoadTexture("rock_normals.png", "rock_normal_map");
-	Texture mossNormalMap = assMng.LoadTexture("crate_normal.png", "moss_normal_map");
-	Texture sandNormalMap = assMng.LoadTexture("sand_normals.png", "sand_normal_map");
+	Texture rockNormalMap = assMng.LoadTexture("rock_normals.jpg", "rock_normal_map");
+	Texture mossNormalMap = assMng.LoadTexture("crate_normal.jpg", "moss_normal_map");
+	Texture sandNormalMap = assMng.LoadTexture("sand_normals.jpg", "sand_normal_map");
 	
 
 	Texture diffuseCrate = assMng.LoadTexture("crate.jpg.png", "cube_diffuse");
@@ -136,7 +136,7 @@ void Application::Run() {
 
 	Texture diffuseWall = assMng.LoadTexture("wall.png", "wall_diffuse");
 	Texture heightWall = assMng.LoadTexture("wall_height.png", "wall_height");
-	Texture normalMapWall = assMng.LoadTexture("wall_normals.png", "wall_normal");
+	Texture normalMapWall = assMng.LoadTexture("wall_normals.jpg", "wall_normal");
 
 	Texture diffuseBricks = assMng.LoadTexture("bricks2.jpg", "brick_diffuse");
 	Texture heightBricks = assMng.LoadTexture("bricks2_disp.jpg", "brick_height");

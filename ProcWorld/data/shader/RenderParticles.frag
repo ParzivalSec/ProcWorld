@@ -3,6 +3,11 @@
 in vec2 uv;
 flat in int type;
 
+uniform sampler2D smoke;
+uniform sampler2D rocket;
+uniform sampler2D sparklies;
+uniform sampler2D box;
+
 out vec4 fragColor;
 
 void main()
@@ -10,21 +15,21 @@ void main()
 	// Emitter
 	if (type == 0)
 	{
-		fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		fragColor = texture2D(box, uv);//vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	// Smoke
 	else if (type == 1)
 	{
-		fragColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		fragColor = texture2D(smoke, uv);//vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	}
 	// Rockets
 	else if (type == 2)
 	{
-		fragColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+		fragColor = texture2D(rocket, uv);//vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	}
 	// Sparklies
 	else 
 	{
-		fragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+		fragColor = texture2D(sparklies, uv);//vec4(1.0f, 0.0f, 1.0f, 1.0f);
 	}
 }
