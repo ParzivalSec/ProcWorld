@@ -1,26 +1,24 @@
 #version 410 core
 
-in Particle
-{
-	flat int type;
-} particle;
+in vec2 uv;
+flat in int type;
 
 out vec4 fragColor;
 
 void main()
 {
 	// Emitter
-	if (particle.type == 0)
+	if (type == 0)
 	{
 		fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 	// Smoke
-	else if (particle.type == 1)
+	else if (type == 1)
 	{
 		fragColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
 	}
 	// Rockets
-	else if (particle.type == 2)
+	else if (type == 2)
 	{
 		fragColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	}

@@ -63,7 +63,8 @@ void Particles::System::SetupRenderShader(AssetManager& assetManager)
 	if (assetManager.GetShaderByName("Particle_Render_Shader") == nullptr)
 	{
 		ShaderProgram& renderPrg = assetManager.AddShaderSet("Particle_Render_Shader");
-		renderPrg.AddShaders(GL_VERTEX_SHADER, "RenderParticles.vert", GL_FRAGMENT_SHADER, "RenderParticles.frag");
+		renderPrg.AddShaders(GL_VERTEX_SHADER, "RenderParticles.vert", GL_GEOMETRY_SHADER, "RenderParticles.geom", 
+			GL_FRAGMENT_SHADER, "RenderParticles.frag");
 
 		m_renderShader = renderPrg.m_id;
 

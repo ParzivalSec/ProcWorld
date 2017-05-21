@@ -7,15 +7,17 @@ layout (location = 3) in int type;
 
 uniform mat4 model;
 uniform mat4 view;
-uniform mat4 projection;
 
 out Particle
 {
+	vec3 position;
+	float lifeTime;
 	flat int type;
 } particle;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(position, 1.0f);
+	particle.position =  (view * model * vec4(position, 1.0f)).xyz;
 	particle.type = type;
+	particle.lifeTime = lifeTime;
 }
