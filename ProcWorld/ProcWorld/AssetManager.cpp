@@ -50,6 +50,16 @@ Texture* AssetManager::GetTextureByName(std::string textureName)
 	return nullptr;
 }
 
+ShaderProgram* AssetManager::GetShaderByName(std::string shaderName)
+{
+	if (m_programs.find(shaderName) != m_programs.end())
+	{
+		return &m_programs.at(shaderName);
+	}
+
+	return nullptr;
+}
+
 void AssetManager::ShaderWatcher() {
 	namespace fs = std::experimental::filesystem;
 	using namespace std::chrono_literals;

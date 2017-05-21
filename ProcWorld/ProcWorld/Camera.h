@@ -29,6 +29,7 @@ public:
 	const glm::mat4& GetViewMat(void) const;
 	const glm::mat4& GetProjectionMat(void) const;
 	const glm::vec3& GetPosition(void) const;
+	const glm::vec3& GetDirection(void) const;
 
 	void UpdateRotation(void);
 	void UpdateVectors(void);

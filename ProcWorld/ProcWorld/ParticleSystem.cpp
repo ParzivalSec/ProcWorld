@@ -60,25 +60,39 @@ void Particles::System::SetupBuffers(void)
 
 void Particles::System::SetupRenderShader(AssetManager& assetManager)
 {
-	ShaderProgram& renderPrg = assetManager.AddShaderSet("Particle_Render_Shader");
-	renderPrg.AddShaders(GL_VERTEX_SHADER, "RenderParticles.vert", GL_FRAGMENT_SHADER, "RenderParticles.frag");
+	if (assetManager.GetShaderByName("Particle_Render_Shader") == nullptr)
+	{
+		ShaderProgram& renderPrg = assetManager.AddShaderSet("Particle_Render_Shader");
+		renderPrg.AddShaders(GL_VERTEX_SHADER, "RenderParticles.vert", GL_FRAGMENT_SHADER, "RenderParticles.frag");
 
-	m_renderShader = renderPrg.m_id;
+		m_renderShader = renderPrg.m_id;
 
-	renderPrg.Link();
+		renderPrg.Link();
+	}
+	else
+	{
+		m_renderShader = assetManager.GetShaderByName("Particle_Render_Shader")->m_id;
+	}
 }
 
 void Particles::System::SetupUpdateShader(AssetManager& assetManager)
 {
-	ShaderProgram& updatePrg = assetManager.AddShaderSet("Particle_Update_Shader");
-	updatePrg.AddShaders(GL_VERTEX_SHADER, "UpdateParticles.vert", GL_GEOMETRY_SHADER, "UpdateParticles.geom");
+	if (assetManager.GetShaderByName("Particle_Update_Shader") == nullptr)
+	{
+		ShaderProgram& updatePrg = assetManager.AddShaderSet("Particle_Update_Shader");
+		updatePrg.AddShaders(GL_VERTEX_SHADER, "UpdateParticles.vert", GL_GEOMETRY_SHADER, "UpdateParticles.geom");
 
-	m_updateShader = updatePrg.m_id;
+		m_updateShader = updatePrg.m_id;
 
-	const GLchar* feedbackVaryings[] = { "outPosition", "outVelocity", "outLifeTime", "outType" };
-	glTransformFeedbackVaryings(m_updateShader, 4, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
+		const GLchar* feedbackVaryings[] = { "outPosition", "outVelocity", "outLifeTime", "outType" };
+		glTransformFeedbackVaryings(m_updateShader, 4, feedbackVaryings, GL_INTERLEAVED_ATTRIBS);
 
-	updatePrg.Link();
+		updatePrg.Link();
+	}
+	else
+	{
+		m_updateShader = assetManager.GetShaderByName("Particle_Update_Shader")->m_id;
+	}
 }
 
 void Particles::System::Tick(float deltaTime)

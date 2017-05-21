@@ -8,12 +8,13 @@
 #include "Camera.h"
 #include "DensityPass.h"
 #include "GeometryPass.h"
-#include <gtc/matrix_transform.inl>
+#include <gtc/matrix_transform.hpp>
 #include "GPUNoise.h"
 #include <iostream>
 #include "Cube.h"
 #include "Particle.h"
 #include "ParticleSystem.h"
+#include "KDTreeController.h"
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -57,6 +58,10 @@ void Application::Run() {
 	prg.AddShaders(GL_VERTEX_SHADER, "Color.vert", GL_FRAGMENT_SHADER, "Color.frag");
 	prg.Link();
 
+	ShaderProgram& defaultPrg = assMng.AddShaderSet("default");
+	defaultPrg.AddShaders(GL_VERTEX_SHADER, "default.vert", GL_FRAGMENT_SHADER, "default.frag");
+	defaultPrg.Link();
+
 	ShaderProgram& cubePrg = assMng.AddShaderSet("CubeShader");
 	cubePrg.AddShaders(GL_VERTEX_SHADER, "CubeParallax.vert", GL_FRAGMENT_SHADER, "CubeParallax.frag");
 	cubePrg.Link();
@@ -83,6 +88,32 @@ void Application::Run() {
 	geometryPass.SetupResources(assMng);
 	geometryPass.GenerateGeometry(densityPass);
 
+	// INFO: Here we extract the generate geometry data from the GPU and build the KDTree
+	glm::mat4 modelMat = glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f));
+	std::vector<glm::vec3> sceneGeometry;
+	for (size_t i = 0; i < 16; i++)
+	{
+		std::vector<glm::vec3> sliceBuffer(geometryPass.m_vericesPerSlice[i] * 3 * 3);
+		glBindBuffer(GL_ARRAY_BUFFER, geometryPass.m_sliceTBOs[i]);
+			glGetBufferSubData(GL_ARRAY_BUFFER, 0, geometryPass.m_vericesPerSlice[i] * 3 * 9 * sizeof(float), &sliceBuffer[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		for (size_t v = 0; v < geometryPass.m_vericesPerSlice[i] * 3 * 3; v += 3)
+		{
+			glm::vec4 pos(sliceBuffer[v], 1.0f);
+			pos = modelMat * pos;
+			sceneGeometry.push_back(pos);
+		}
+	}
+
+	// INFO: Create KDTree and pass it the assembled geometry
+	KDTreeController kdTree(sceneGeometry);
+	kdTree.BuildSceneTree();
+
+	kdTree.PrintRootBoundingBox();
+	
+	std::cout << "Geometry has " << sceneGeometry.size() << " vertices!" << std::endl;
+		 
 	// TODO: Refactor aset manager to use a PackedArray
 	Texture rockTexture = assMng.LoadTexture("rock.jpg", "rock");
 	Texture mossTexture = assMng.LoadTexture("crate.jpg.png", "moss");
@@ -111,9 +142,7 @@ void Application::Run() {
 	Texture heightBricks = assMng.LoadTexture("bricks2_disp.jpg", "brick_height");
 	Texture normalMapBricks = assMng.LoadTexture("bricks2_normal.jpg", "brick_normal");
 
-	Particles::System particleSystem(glm::vec3(0.0f, 0.0f, 0.0f), 20.0f);
-	particleSystem.SetupRenderShader(assMng);
-	particleSystem.SetupUpdateShader(assMng);
+	std::vector<Particles::System> particleSystemRegistry;
 
 	bool draw_wireframe = false;
 	int initialSteps = 16;
@@ -204,6 +233,21 @@ void Application::Run() {
 						std::cout << "Steps: " << initialSteps << " / " << refinementSteps << std::endl;
 					}
 
+				case SDL_MOUSEBUTTONUP:
+					if (event.button.button == SDL_BUTTON_LEFT)
+					{
+						glm::vec3 rayHit = kdTree.Hit(cam.GetPosition(), cam.GetDirection() * 1000.0f);
+
+						if (rayHit != glm::vec3(0, 0, 0))
+						{
+							Particles::System particleSystem(rayHit, 20.0f);
+							particleSystem.SetupRenderShader(assMng);
+							particleSystem.SetupUpdateShader(assMng);
+							particleSystemRegistry.push_back(particleSystem);
+						}
+					}
+					break;
+
 				default:
 					break;
 			}
@@ -214,14 +258,18 @@ void Application::Run() {
 		cam.ProcessMovement(dt.count());
 		// Update & render section
 		Update(dt.count());
-		particleSystem.Tick(dt.count());
+
+		for (auto& particleSys : particleSystemRegistry)
+		{
+			particleSys.Tick(dt.count());
+		}
 
 		OpenGLRenderer::ViewPort(0, 0, m_windowWidth, m_windowHeight);
 		OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 
-		glPointSize(10.0f);
+		glPointSize(5.0f);
 
 		// Render
 		{
@@ -370,7 +418,20 @@ void Application::Run() {
 		}
 
 		// INFO: Draw Particles
-		particleSystem.Render(glm::mat4(1.0f), cam.GetViewMat(), cam.GetProjectionMat());
+
+		for (auto& particleSys : particleSystemRegistry)
+		{
+			particleSys.Render(glm::mat4(1.0f), cam.GetViewMat(), cam.GetProjectionMat());
+		}
+
+		GLuint bbShader = assMng.GetShaderByName("default")->m_id;
+
+		OpenGLRenderer::UseShader(bbShader);
+		OpenGLRenderer::SetUniformMatrix4fv(bbShader, "view", cam.GetViewMat());
+		OpenGLRenderer::SetUniformMatrix4fv(bbShader, "projection", cam.GetProjectionMat());
+		// kdTree.DrawBoundingBoxes(kdTree.root, 100, assMng);
+		kdTree.DrawHitTriangles(cam, assMng);
+		kdTree.DrawRays(cam);
 
 		SDL_GL_SwapWindow(m_applicationWindow.get());
 

@@ -18,6 +18,8 @@ public:
 	Texture& LoadTexture(std::string fileName, std::string assetName);
 	Texture* GetTextureByName(std::string textureName);
 
+	ShaderProgram* GetShaderByName(std::string shaderName);
+
 	void ShaderWatcher(void);
 	void ReloadData(void);
 

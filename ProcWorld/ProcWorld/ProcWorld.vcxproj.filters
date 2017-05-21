@@ -40,6 +40,12 @@
     <Filter Include="Graphics\ParticleSystem">
       <UniqueIdentifier>{4672a713-99d4-4bfc-9933-1430d51237cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="KDTree">
+      <UniqueIdentifier>{7554cbdf-fbf1-49b1-ab31-8a47d694f4e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KDTree\DebugPrimitives">
+      <UniqueIdentifier>{00f610a0-3cc3-4b24-82b3-95b7e0962ac6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -78,6 +84,18 @@
     </ClCompile>
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Graphics\ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="KDTreeController.cpp">
+      <Filter>KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundingBox.cpp">
+      <Filter>KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="OGLTriangle.cpp">
+      <Filter>KDTree\DebugPrimitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +147,21 @@
     </ClInclude>
     <ClInclude Include="Particle.h">
       <Filter>Graphics\ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTreeController.h">
+      <Filter>KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBox.h">
+      <Filter>KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="MathUtil.h">
+      <Filter>KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="OGLTriangle.h">
+      <Filter>KDTree\DebugPrimitives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

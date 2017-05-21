@@ -89,6 +89,11 @@ const glm::vec3& Camera::GetPosition() const
 	return m_position;
 }
 
+const glm::vec3& Camera::GetDirection() const
+{
+	return m_direction;
+}
+
 void Camera::UpdateRotation() {
 	// Quaternion version
 	glm::quat q = glm::angleAxis(glm::radians(-m_pitch), glm::vec3(1.0f, 0.0f, 0.0f));
