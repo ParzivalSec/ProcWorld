@@ -15,6 +15,10 @@
 #include "Particle.h"
 #include "ParticleSystem.h"
 #include "KDTreeController.h"
+#include <algorithm>
+#include "ShadowPass.h"
+#include "Meshes.h"
+#include <gtc/type_ptr.hpp>
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -87,6 +91,11 @@ void Application::Run() {
 	GeometryPass geometryPass;
 	geometryPass.SetupResources(assMng);
 	geometryPass.GenerateGeometry(densityPass);
+
+	ShadowPass shadowPass(m_windowWidth, m_windowHeight, 1.0f, 1.0f);
+	shadowPass.LoadShaders(assMng);
+
+	GLuint shadowReceiverQuad = meshes::GenerateQuad();
 
 	// INFO: Here we extract the generate geometry data from the GPU and build the KDTree
 	glm::mat4 modelMat = glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f));
@@ -264,8 +273,6 @@ void Application::Run() {
 			particleSys.Tick(dt.count());
 		}
 
-		OpenGLRenderer::ViewPort(0, 0, m_windowWidth, m_windowHeight);
-		OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 
@@ -273,6 +280,19 @@ void Application::Run() {
 
 		// Render
 		{
+			shadowPass.ResetShadowMap();
+
+			// Shadow pass goes first
+			for (size_t i = 0; i < 16; i++)
+			{
+				shadowPass.Render(glm::vec3(0, 10.0f, -10.0f), glm::vec3(0, 0, 0),
+					geometryPass.m_sliceVAOs[i], geometryPass.m_vericesPerSlice[i] * 6,
+					glm::scale(glm::mat4(1.0f), glm::vec3(40.0f, 40.0f, 40.0f)));
+			}
+
+			OpenGLRenderer::ViewPort(0, 0, m_windowWidth, m_windowHeight);
+			OpenGLRenderer::Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 			draw_wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			for (size_t i = 0; i < 16; ++i) {
@@ -354,10 +374,14 @@ void Application::Run() {
 
 		// INFO: Draw cube to test parallax
 		{
+
+			glm::mat4 model_first = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f, 0.0f));
+			model_first = glm::scale(model_first, glm::vec3(10.0f, 10.0f, 10.0f));
+
 			OpenGLRenderer::UseShader(cubePrg.m_id);
 			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "view", cam.GetViewMat());
 			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "projection", cam.GetProjectionMat());
-			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 10.0f)));
+			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", model_first);
 			OpenGLRenderer::SetUniformVector3(cubePrg.m_id, "eyePosition", cam.GetPosition());
 
 			GLuint attrLocation = glGetUniformLocation(cubePrg.m_id, "initialSteps");
@@ -384,7 +408,7 @@ void Application::Run() {
 
 			Cube::DrawCube(cubeVAO);
 
-			glm::mat4 model_second = glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, 0.0f, -10.0f)); 
+			glm::mat4 model_second = glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, 5.0f, 0.0f));
 			model_second = glm::rotate(model_second, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			model_second = glm::scale(model_second, glm::vec3(10.0f, 10.0f, 10.0f));
 			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", model_second);
@@ -400,7 +424,7 @@ void Application::Run() {
 
 			Cube::DrawCube(cubeVAO);
 
-			glm::mat4 model_third = glm::translate(glm::mat4(1.0f), glm::vec3(20.0f, 0.0f, -10.0f));
+			glm::mat4 model_third = glm::translate(glm::mat4(1.0f), glm::vec3(20.0f, 5.0f, 0.0f));
 			model_third = glm::rotate(model_third, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			model_third = glm::scale(model_third, glm::vec3(10.0f, 10.0f, 10.0f));
 			OpenGLRenderer::SetUniformMatrix4fv(cubePrg.m_id, "model", model_third);
@@ -415,13 +439,15 @@ void Application::Run() {
 			glBindTexture(GL_TEXTURE_2D, normalMapBricks.textureID);
 
 			Cube::DrawCube(cubeVAO);
-		}
 
-		// INFO: Draw Particles
+			shadowPass.Render(glm::vec3(0, 10.0f, -10.0f), glm::vec3(0, 0, 0),
+				cubeVAO, 6, model_first);
 
-		for (auto& particleSys : particleSystemRegistry)
-		{
-			particleSys.Render(glm::mat4(1.0f), cam.GetViewMat(), cam.GetProjectionMat());
+			shadowPass.Render(glm::vec3(0, 10.0f, -10.0f), glm::vec3(0, 0, 0),
+				cubeVAO, 6, model_second);
+
+			shadowPass.Render(glm::vec3(0, 10.0f, -10.0f), glm::vec3(0, 0, 0),
+				cubeVAO, 6, model_third);
 		}
 
 		GLuint bbShader = assMng.GetShaderByName("default")->m_id;
@@ -433,14 +459,51 @@ void Application::Run() {
 		kdTree.DrawHitTriangles(cam, assMng);
 		kdTree.DrawRays(cam);
 
+		shadowPass.BlurShadowMap();
+		// INFO: Draw the shadow receiver
+		glUseProgram(defaultPrg.m_id);
+		GLuint uniformLoc = glGetUniformLocation(defaultPrg.m_id, "fragColor");
+		glUniform3fv(uniformLoc, 1, glm::value_ptr(glm::vec3(0.4f, 0.4f, 0.4f)));
+
+		OpenGLRenderer::SetUniformMatrix4fv(defaultPrg.m_id, "view", cam.GetViewMat());
+		OpenGLRenderer::SetUniformMatrix4fv(defaultPrg.m_id, "projection", cam.GetProjectionMat());
+
+		glm::mat4 model_plane = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -5.0f, 20.0f));
+		model_plane = glm::rotate(model_plane, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model_plane = glm::scale(model_plane, glm::vec3(80.0f, 80.0f, 80.0f));
+		OpenGLRenderer::SetUniformMatrix4fv(defaultPrg.m_id, "model", model_plane);
+
+		OpenGLRenderer::SetUniformMatrix4fv(defaultPrg.m_id, "lightSpaceMatrix", shadowPass.GetLightSpaceMatrix(glm::vec3(0, 20.0f, -20.0f)));
+
+		uniformLoc = glGetUniformLocation(defaultPrg.m_id, "shadowMap");
+		glUniform1i(uniformLoc, 0);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, shadowPass.GetShadowMapTextureID());
+
+		glBindVertexArray(shadowReceiverQuad);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+
+		// INFO: Draw Particles
+
+		for (auto& particleSys : particleSystemRegistry)
+		{
+			particleSys.Render(glm::mat4(1.0f), cam.GetViewMat(), cam.GetProjectionMat());
+		}
+
 		SDL_GL_SwapWindow(m_applicationWindow.get());
+
+		// get rid of anything < 10
+		particleSystemRegistry.erase(std::remove_if(particleSystemRegistry.begin(), particleSystemRegistry.end(), [](Particles::System& p) 
+			{ return p.m_particleCount == 0; }), particleSystemRegistry.end());
 
 		if (status == 1)
 			running = false;
 
 		// TODO: Move FPS counter away from here, UI display
-		if (fpsCounter >= 2000) {
-			std::string windowTitle("ProcWorld by Lukas Vogl (FPS: " + std::to_string(1.0f / (average_deltaTime.count() / 2000.0f)) + ")");
+		if (fpsCounter >= 500) {
+			std::string windowTitle("ProcWorld by Lukas Vogl (FPS: " + std::to_string(1.0f / (average_deltaTime.count() / 500.0f)) + ")");
 			SDL_SetWindowTitle(m_applicationWindow.get(), windowTitle.c_str());
 			fpsCounter = 0;
 			average_deltaTime = duration<float>::zero();

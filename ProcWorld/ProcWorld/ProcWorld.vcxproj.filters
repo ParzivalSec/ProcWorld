@@ -97,6 +97,9 @@
     <ClCompile Include="OGLTriangle.cpp">
       <Filter>KDTree\DebugPrimitives</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowPass.cpp">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDLWrapper.h">
@@ -162,6 +165,15 @@
     </ClInclude>
     <ClInclude Include="OGLTriangle.h">
       <Filter>KDTree\DebugPrimitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowPass.h">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Meshes.h">
+      <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

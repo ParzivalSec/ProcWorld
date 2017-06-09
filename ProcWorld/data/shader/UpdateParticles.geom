@@ -104,7 +104,7 @@ void UpdateEmitter(vec3 pos, vec3 vel, float ttl, int type)
 				outPosition.x = pos.x + cos(rocketRotation);
 				outPosition.z = pos.z + sin(rocketRotation);
 				outVelocity = vec3(0, 5.0f, 0);
-				outLifeTime = RocketLifetimeInitial;
+				outLifeTime = RocketLifetimeInitial + randZeroOne() * 2.0f;
 				outType = 2;
 				
 				EmitVertex();

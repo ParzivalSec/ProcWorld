@@ -169,7 +169,7 @@ void main()
 	float spec = pow(max(dot(norm.xyz, halfwayDir), 0.0f), 25.0f);
 	vec3 specular = tex.xyz * spec;
 	
-	vec3 lightedTex = ambient + diffuse + spec;
+	vec3 lightedTex = ambient + diffuse * 0.5f;
 	
 	color = vec4(lightedTex.xyz, 1.0f);
 } 

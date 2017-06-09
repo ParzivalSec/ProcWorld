@@ -169,6 +169,7 @@
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="ShadowPass.cpp" />
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
@@ -185,14 +186,17 @@
     <ClInclude Include="KDTreeController.h" />
     <ClInclude Include="MathUtil.h" />
     <ClInclude Include="mc_cases_lut.h" />
+    <ClInclude Include="Meshes.h" />
     <ClInclude Include="OGLTriangle.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="SDLWrapper.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="ShadowPass.h" />
     <ClInclude Include="Texture3D.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>

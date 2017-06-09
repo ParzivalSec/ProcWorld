@@ -3,6 +3,7 @@
 #include "AssetManager.h"
 #include <gtc/type_ptr.hpp>
 #include "OpenGLRenderer.h"
+#include "Random.h"
 
 Particles::System::System(glm::vec3 emitterPosition, float emitterTTL)
 	: m_emitter(emitterPosition, emitterTTL, 0)
@@ -12,16 +13,16 @@ Particles::System::System(glm::vec3 emitterPosition, float emitterTTL)
 	, m_updateShader(0)
 	, m_query(0)
 	, m_particleCount(1)
-	, m_smokeFrequency(1.0f)
+	, m_smokeFrequency(1.5f)
 	, m_smokeAccumulator(0.0f)
 	, m_smokeTTL(3.0f)
-	, m_rocketFrequencyMin(2.0f)
-	, m_rocketFrequencyMax(4.0f)
+	, m_rocketFrequencyMin(0.5f)
+	, m_rocketFrequencyMax(0.5f)
 	, m_rocketAccumulator(0.0f)
-	, m_rocketTTL(2.0f)
-	, m_rocketAmount(2.0f)
+	, m_rocketTTL(0.5f)
+	, m_rocketAmount(3.0f)
 	, m_fireworkAmount(5.0f)
-	, m_fireworkTTL(1.5f)
+	, m_fireworkTTL(1.0f)
 	, m_currentBuffer(0)
 {
 	SetupBuffers();
@@ -106,6 +107,11 @@ void Particles::System::Tick(float deltaTime)
 	m_smokeAccumulator >= m_smokeFrequency ? m_smokeAccumulator = 0.0f : m_smokeAccumulator += deltaTime;
 	m_rocketAccumulator >= m_rocketFrequencyMax ? m_rocketAccumulator = 0.0f : m_rocketAccumulator += deltaTime;
 
+	glm::vec3 randomSeed;
+	randomSeed.x = random::xorshift::IntRange(0, 100);
+	randomSeed.y = random::xorshift::IntRange(0, 222);
+	randomSeed.z = random::xorshift::IntRange(0, 333);
+
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	glUseProgram(m_updateShader);
@@ -144,6 +150,9 @@ void Particles::System::Tick(float deltaTime)
 	// General Uniforms
 	attribLoc = glGetUniformLocation(m_updateShader, "DeltaTime");
 	glUniform1f(attribLoc, deltaTime);
+
+	attribLoc = glGetUniformLocation(m_updateShader, "RandomSeed");
+	glUniform3f(attribLoc, randomSeed.x, randomSeed.y, randomSeed.z);
 
 	OpenGLRenderer::BindVertexArray(m_VAO[m_currentBuffer]);
 		// Begin: Transform Feedback

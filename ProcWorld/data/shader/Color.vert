@@ -43,6 +43,6 @@ void main()
 	
 	vertex_data.tsEyePosition = TBN * eyeWorldPosition;
 	vertex_data.tsPosition = TBN * vertex_data.worldPosition;
-	vertex_data.tsLightPos = TBN * vec3(0.0f, 0.0f, 0.0f);
+	vertex_data.tsLightPos = TBN * vec3(0, 10.0f, -10.0f);
 	//vertex_data.normal = TBN * vertex_data.normal;
 }

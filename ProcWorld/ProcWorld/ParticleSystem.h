@@ -26,8 +26,11 @@ namespace Particles
 		GLuint m_VBO[2], m_VAO[2];
 		GLuint m_renderShader, m_updateShader;
 		GLuint m_query;
+	public:
 
 		GLuint m_particleCount;
+
+	private:
 
 		//// Smoke parameters
 		float m_smokeFrequency;
