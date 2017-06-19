@@ -16,6 +16,8 @@ public:
 	void ResetShadowMap(void);
 	void BlurShadowMap(void);
 
+	void SetBlurFactor(float blur);
+
 	GLuint GetShadowMapTextureID(void) const { return m_shadowMapColorId; }
 	glm::mat4 GetLightSpaceMatrix(glm::vec3 lightPosition);
 

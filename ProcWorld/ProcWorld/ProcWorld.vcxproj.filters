@@ -100,6 +100,9 @@
     <ClCompile Include="ShadowPass.cpp">
       <Filter>Graphics\RenderPasses</Filter>
     </ClCompile>
+    <ClCompile Include="TesselationPass.cpp">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDLWrapper.h">
@@ -173,6 +176,12 @@
       <Filter>Graphics\RenderPasses</Filter>
     </ClInclude>
     <ClInclude Include="Meshes.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="TesselationPass.h">
+      <Filter>Graphics\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Box.h">
       <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>

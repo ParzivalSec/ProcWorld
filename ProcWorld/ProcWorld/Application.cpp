@@ -19,6 +19,7 @@
 #include "ShadowPass.h"
 #include "Meshes.h"
 #include <gtc/type_ptr.hpp>
+#include "TesselationPass.h"
 
 Application::Application(std::string appConfigFileName) 
 	: m_initializedWithError(false)
@@ -58,6 +59,10 @@ void Application::Run() {
 		45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
 
 	AssetManager assMng;
+	ShaderProgram& standardPrg = assMng.AddShaderSet("StandardShader");
+	standardPrg.AddShaders(GL_VERTEX_SHADER, "StandardShader.vert", GL_FRAGMENT_SHADER, "StandardShader.frag");
+	standardPrg.Link();
+
 	ShaderProgram& prg = assMng.AddShaderSet("Color");
 	prg.AddShaders(GL_VERTEX_SHADER, "Color.vert", GL_FRAGMENT_SHADER, "Color.frag");
 	prg.Link();
@@ -151,12 +156,16 @@ void Application::Run() {
 	Texture heightBricks = assMng.LoadTexture("bricks2_disp.jpg", "brick_height");
 	Texture normalMapBricks = assMng.LoadTexture("bricks2_normal.jpg", "brick_normal");
 
+	TesselationPass tesselationPass(glm::vec3(-30.0f, 10.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f));
+	tesselationPass.SetupResources(assMng);
+
 	std::vector<Particles::System> particleSystemRegistry;
 
 	bool draw_wireframe = false;
 	int initialSteps = 16;
 	int refinementSteps = 8;
 	bool tweakInitialSteps = true;
+	float blurFactor = 1.0f;
 
 	duration<float> average_deltaTime;
 	int fpsCounter = 0;
@@ -214,6 +223,18 @@ void Application::Run() {
 					else if (event.key.keysym.sym == SDLK_p)
 					{
 						tweakInitialSteps = !tweakInitialSteps;
+					}
+					else if (event.key.keysym.sym == SDLK_1)
+					{
+						blurFactor -= 0.25f;
+						blurFactor = std::max(0.0f, blurFactor);
+						shadowPass.SetBlurFactor(blurFactor);
+					}
+					else if (event.key.keysym.sym == SDLK_2)
+					{
+						blurFactor += 0.25f;
+						blurFactor = std::min(10.0f, blurFactor);
+						shadowPass.SetBlurFactor(blurFactor);
 					}
 					break;
 
@@ -484,6 +505,9 @@ void Application::Run() {
 		glBindVertexArray(shadowReceiverQuad);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
+
+		// INFO: Draw tesselated cube
+		tesselationPass.RenderBox(cam.GetViewMat(), cam.GetProjectionMat());
 
 		// INFO: Draw Particles
 

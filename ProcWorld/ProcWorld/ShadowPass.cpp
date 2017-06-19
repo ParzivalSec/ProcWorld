@@ -125,6 +125,11 @@ void ShadowPass::BlurShadowMap()
 	glEnable(GL_DEPTH_TEST);
 }
 
+void ShadowPass::SetBlurFactor(float blur)
+{
+	m_blurMapScale = blur;
+}
+
 glm::mat4 ShadowPass::GetLightSpaceMatrix(glm::vec3 lightPosition)
 {
 	//Calculate lightSpaceMatrix

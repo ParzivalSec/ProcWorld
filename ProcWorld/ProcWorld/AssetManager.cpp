@@ -62,7 +62,7 @@ Texture& AssetManager::LoadTexture(std::string fileName, std::string assetName)
 
 Texture* AssetManager::GetTextureByName(std::string textureName)
 {
-	if (m_textures.find(textureName) == m_textures.end())
+	if (m_textures.find(textureName) != m_textures.end())
 	{
 		return &m_textures.at(textureName);
 	}

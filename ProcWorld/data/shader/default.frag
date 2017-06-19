@@ -15,6 +15,7 @@ vec4 scPostW;
 
 float chebyshevUpperBound(float distance)
 {
+// Firstly sample the moments from the depth texture, stored in R and G channel
 	vec2 moments = texture2D(shadowMap, scPostW.xy).rg;
 	
 	// Surface is not in shadow if it is before every occluder
@@ -45,6 +46,8 @@ void main()
 	
 	float shadowFactor = 1.0f;
 	
+	// Check if we are outside of the shadowmap, if not we can calulate the amount the fragment should be shadowed using
+	// a chebyshev upper bound for the depth value
 	bool outsideShadowMap = shadowCaster.w <= 0.0f || (scPostW.x < 0 || scPostW.y < 0) || (scPostW.x >= 1 || scPostW.y >= 1);
 	if (!outsideShadowMap)
 	{
